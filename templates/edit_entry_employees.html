@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+
+<h2>Редактировать запись</h2>
+<div style="margin-bottom: 20px;"></div>
+
+<form action="/save_entry_employees/{{ entry_data.id }}" method="post" class="form-contact">
+
+    <label for="name">ФИО сотрудника:</label>
+    <input type="text" id="name" name="name" value="{{ entry_data.name }}" class="form-contact" required ><br><br>
+    <label for="profession">Профессия:</label>
+    <input type="text" id="profession" name="profession" value="{{ entry_data.profession }}" class="form-contact" required ><br><br>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+{% endblock %}

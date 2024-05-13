@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+
+<h2>Добавление данных о сотруднике</h2>
+<div style="margin-bottom: 20px;"></div>
+
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+<form action="{{url_for('addEmployees')}}" method="post" class="form-contact">
+<p><label>ФИО сотрудника: </label> <input type="text" name="name" value="" required />
+<p><label>Должность: </label> <input type="text" name="profession" value="" required />
+<p><input type="submit" value="Добавить" />
+</form>
+
+{% endblock %}

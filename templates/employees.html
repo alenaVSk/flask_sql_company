@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+
+<h2>Список сотрудников</h2>
+<div style="margin-bottom: 20px;"></div> <!-- Пространство -->
+
+<!-- Форма поиска -->
+<form class="d-flex" role="search">
+  <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
+  <button class="btn btn-outline-success narrow-button" type="submit">Вернуться к списку</button>
+</form>
+
+<table id="myTable" class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">ФИО сотрудника</th>
+      <th scope="col">Профессия</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in employees %}
+    <tr>
+      <th scope="row">{{ loop.index }}</th> <!-- Используем loop.index для нумерации строк -->
+      <td>{{ row.name }}</td>
+      <td>{{ row.profession }}</td>
+      <td>
+          <a href="/edit_entry_employees/{{ row.id }}" class="btn btn-outline-primary btn-sm">Изменить</a>
+      </td>
+
+      <td>
+        <!-- форма кнопки "Удалить", она отправляет POST-запрос на сервер с идентификатором записи, которую нужно удалить.-->
+        <form action="/delete_entry_employees/{{ row.id }}" method="post">
+            <button type="submit" class="btn btn-outline-danger btn-sm">Удалить</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+<!-- JavaScript-код для обработки поиска -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#searchInput").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#myTable tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  });
+</script>
+
+{% endblock %}

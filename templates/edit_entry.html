@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+
+<h2>Редактировать запись</h2>
+<div style="margin-bottom: 20px;"></div>
+
+<form action="/save_entry/{{ entry_data.id }}" method="post" class="form-contact">
+    <label for="date_order">Дата заказа:</label>
+    <input type="text" id="date_order" name="date_order" value="{{ entry_data.date_order }}" class="form-contact" required ><br><br>
+    <label for="name_customer">ФИО клиента:</label>
+    <input type="text" id="name_customer" name="name_customer" value="{{ entry_data.name_customer }}" class="form-contact" style="width: 400px;" required ><br><br>
+    <label for="brand_car">Марка авто:</label>
+    <input type="text" id="brand_car" name="brand_car" value="{{ entry_data.brand_car }}" class="form-contact" required ><br><br>
+    <label for="year_car">Год выпуска:</label>
+    <input type="text" id="year_car" name="year_car" value="{{ entry_data.year_car }}" class="form-contact" required ><br><br>
+    <label for="number_car">Номер авто:</label>
+    <input type="text" id="number_car" name="number_car" value="{{ entry_data.number_car }}" class="form-contact" required ><br><br>
+    <label for="text_order">Причина обращения:</label>
+    <input type="text" id="text_order" name="text_order" value="{{ entry_data.text_order }}" class="form-contact" style="width: 400px;" required ><br><br>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+{% endblock %}

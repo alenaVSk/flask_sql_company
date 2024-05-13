@@ -1,0 +1,64 @@
+/* кнопка поиска на странице "Журнал" */
+.narrow-button {
+    max-width: 250px; /* Пример фиксированной максимальной ширины */
+    white-space: nowrap; /* Предотвращает перенос текста на новую строку */
+    font-size: 16px; /* Устанавливает размер шрифта для кнопки */
+  }
+
+.narrow-search {
+    max-width: 400px; /* Устанавливаем максимальную ширину поля для поиска */
+  }
+
+ /* Пример стиля для увеличения размера шрифта */
+.form-field {
+     font-size: 20px !important; /* Установите желаемый размер шрифта */
+        }
+
+html, body {
+	font-family: 'Arial';
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+}
+
+
+a {
+	color: #0059b2;
+	text-decoration: none;
+}
+a:hover {
+	color: #CC0000;
+	text-decoration: underline;
+}
+
+.clear {clear: both;}
+
+div.content {
+	margin: 10px;
+}
+
+.form-contact label {
+	display: inline-block;
+	min-width: 80px;
+}
+.form-contact p {margin: 10px 0 10px 0;}
+.form-contact input[type=submit], textarea {
+	font-size: 16px;
+}
+
+.flash {padding: 10px;}
+.flash.success {
+	border: 1px solid #21DB56;
+	background: #AEFFC5;
+}
+.flash.error {
+	border: 1px solid #FF4343;
+	background: #FF9C9C;
+}
+
+.bordered-text {
+        border: 1px solid #000; /* цвет рамки и толщина */
+        padding: 10px; /* отступ внутри рамки */
+        width: 300px; /* ширина рамки */
+    }

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+
+<h2>Добавление данных в журнал заказов</h2>
+<div style="margin-bottom: 20px;"></div>
+
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+<form action="{{url_for('addCustomer')}}" method="post" class="form-contact">
+<p><label>Дата заказа: </label> <input type="text" name="date_order" value="" required />
+<p><label>ФИО клиента: </label> <input type="text" name="name_customer" value="" style="width: 400px;" required />
+<p><label>Марка авто: </label> <input type="text" name="brand_car" value="" required />
+<p><label>Год выпуска: </label> <input type="text" name="year_car" value="" required />
+<p><label>Номер авто: </label> <input type="text" name="number_car" value="" required />
+<p><label>Причина обращения: </label> <input type="text" name="text_order" value="" style="width: 800px;" required />
+<p><input type="submit" value="Добавить" />
+</form>
+
+{% endblock %}

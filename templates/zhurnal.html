@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+
+<h2>Журнал заказов</h2>
+<div style="margin-bottom: 20px;"></div> <!-- Пространство -->
+
+<!-- Форма поиска -->
+<form class="d-flex" role="search">
+  <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
+  <button class="btn btn-outline-success narrow-button" type="submit">Вернуться к журналу</button>
+</form>
+
+<div class="table-responsive">  <!-- адаптивность для таблицы, не будет выходить за пределы контейнера -->
+<table id="myTable" class="table table-striped max-width: 100%">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">Дата заказа</th>
+      <th scope="col">ФИО клиента</th>
+      <th scope="col">Марка авто</th>
+      <th scope="col">Год выпуска</th>
+      <th scope="col">Номер авто</th>
+      <th scope="col">Причина обращения</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in log %}
+    <tr>
+      <th scope="row">{{ loop.index }}</th> <!-- Используем loop.index для нумерации строк -->
+      <td>{{ row.date_order }}</td>
+      <td>{{ row.name_customer }}</td>
+      <td>{{ row.brand_car }}</td>
+      <td>{{ row.year_car }}</td>
+      <td>{{ row.number_car }}</td>
+      <td>{{ row.text_order }}</td>
+      <td>
+          <a href="/edit_entry/{{ row.id }}" class="btn btn-outline-primary btn-sm">Изменить</a>
+      </td>
+
+      <td>
+        <!-- форма кнопки "Удалить", она отправляет POST-запрос на сервер с идентификатором записи, которую нужно удалить.-->
+        <form action="/delete_entry/{{ row.id }}" method="post">
+            <button type="submit" class="btn btn-outline-danger btn-sm">Удалить</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+
+<div class="pagination">   <!-- кнопки для пагинации -->
+  <button class="btn btn-outline-primary prev-page"></button>
+  <button class="btn btn-outline-primary next-page"></button>
+</div>
+
+<!-- JavaScript-код для обработки поиска -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#searchInput").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#myTable tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  });
+</script>
+
+<!-- JavaScript-код для пагинации -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    var currentPage = 1;
+    var rowsPerPage = 12; // Количество строк на одной странице
+
+    // Показать нужные строки при загрузке страницы
+    showRows(currentPage, rowsPerPage);
+    updatePagination(); // Обновляем пагинацию при загрузке страницы
+
+    // Обработчик нажатия кнопки "Previous"
+    $(".prev-page").click(function() {
+      if (currentPage > 1) {
+        currentPage--;
+        showRows(currentPage, rowsPerPage);
+        updatePagination(); // Обновляем пагинацию при переходе на предыдущую страницу
+      }
+    });
+
+    // Обработчик нажатия кнопки "Next"
+    $(".next-page").click(function() {
+      // Предполагая, что у вас есть функция, которая возвращает общее количество строк в вашей таблице
+      if ((currentPage * rowsPerPage) < getTotalRowsCount()) {
+        currentPage++;
+        showRows(currentPage, rowsPerPage);
+        updatePagination(); // Обновляем пагинацию при переходе на следующую страницу
+      }
+    });
+
+    // Функция для обновления текста кнопок пагинации с номером текущей страницы
+    function updatePagination() {
+      $(".prev-page").text("  " + currentPage);
+      $(".next-page").text("  " + (currentPage + 1));
+    }
+
+    // Функция для отображения нужных строк таблицы
+    function showRows(pageNumber, rowsPerPage) {
+      var startIndex = (pageNumber - 1) * rowsPerPage;
+      var endIndex = startIndex + rowsPerPage;
+
+      // Скрыть все строки таблицы
+      $("#myTable tbody tr").hide();
+
+      // Показать только нужные строки для текущей страницы
+      $("#myTable tbody tr").slice(startIndex, endIndex).show();
+    }
+
+    // Функция, которая возвращает общее количество строк в вашей таблице
+    function getTotalRowsCount() {
+      return $("#myTable tbody tr").length;
+    }
+  });
+</script>
+
+{% endblock %}
