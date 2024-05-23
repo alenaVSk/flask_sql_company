@@ -23,6 +23,7 @@
       <th scope="col">Год выпуска</th>
       <th scope="col">Номер авто</th>
       <th scope="col">Причина обращения</th>
+      <th scope="col">Номер акта</th>
     </tr>
   </thead>
   <tbody>
@@ -35,6 +36,11 @@
       <td>{{ row.year_car }}</td>
       <td>{{ row.number_car }}</td>
       <td>{{ row.text_order }}</td>
+      <td>{{ row.id_act }}</td>
+      <td>
+          <a href="/edit_entry_act/{{ row.id }}" class="btn btn-outline-primary btn-sm">Создать акт</a>
+      </td>
+
       <td>
           <a href="/edit_entry/{{ row.id }}" class="btn btn-outline-primary btn-sm">Изменить</a>
       </td>

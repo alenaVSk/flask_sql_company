@@ -23,7 +23,6 @@ def connect_db():  # общая функция для установления �
     conn.row_factory = sqlite3.Row  # записи будут представлены не в виде кортежей, а в виде словаря (для исп в шаблонах)
     return conn
 
-
 def create_db():
     """Вспомогательная функция для создания таблиц БД (без запуска вебсервера)"""
     db = connect_db()
@@ -41,6 +40,8 @@ def get_db():
 
 
 dbase = None
+
+
 @app.before_request
 def before_request():
     """Установление соединения с БД перед выполнением запроса"""
@@ -64,7 +65,7 @@ def addCustomer():
     if request.method == "POST":
 
         res = dbase.addCustomer(request.form['date_order'], request.form['name_customer'], request.form['brand_car'],
-                                request.form['year_car'], request.form['number_car'], request.form['text_order'],)
+                                request.form['year_car'], request.form['number_car'], request.form['text_order'], request.form['id_act'])
         if not res:
             flash('Ошибка добавления', category='error')
         else:
@@ -92,7 +93,7 @@ def edit_entry(entry_id):
     return render_template('edit_entry.html', title="Редактировать", entry_data=entry_data)
 
 
-# Маршрут для сохранения изменений
+# Маршрут для сохранения изменений в "Журнал"
 @app.route('/save_entry/<int:entry_id>', methods=['POST'])
 def save_entry(entry_id):
     date_order = request.form['date_order']
@@ -101,8 +102,44 @@ def save_entry(entry_id):
     year_car = request.form['year_car']
     number_car = request.form['number_car']
     text_order = request.form['text_order']
-    dbase.update_entry(entry_id, date_order, name_customer, brand_car, year_car, number_car, text_order)
+    id_act = request.form['id_act']
+    dbase.update_entry(entry_id, date_order, name_customer, brand_car, year_car, number_car, text_order, id_act)
     return redirect(url_for('showZhurnal'))
+
+# Маршрут для составления акта (получение данных из "Журнала" по id)
+@app.route('/edit_entry_act/<int:entry_id>', methods=['GET'])
+def edit_entry_act(entry_id):
+    entry_data = dbase.get_entry(entry_id)
+    #print(entry_id, entry_data)  # Проверка, получены ли данные
+
+    return render_template('act.html', title="Составить акт выполненных работ", entry_data=entry_data)
+
+# Маршрут для добавления данных в акт
+@app.route('/edit_entry_act/<int:entry_id>', methods=['POST'])
+def save_new_act(entry_id):
+    # Получить данные из формы
+    date_act = request.form.get('date_act')
+    name_work = request.form.get('name_work')
+    price_work = request.form.get('price_work')
+    name = request.form.get('name')
+    price_unit = request.form.get('price_unit')
+    quantity = request.form.get('quantity')
+
+    # Сохранить новые данные в таблицу act и получить id нового акта
+    id_act = dbase.save_new_act(date_act, name_work, price_work)
+
+    if id_act is not None:
+        #print(f"Новый акт сохраняется с id: {id_act}")
+        #print(f"Сохранение в stock_minus: name={name}, price_unit={price_unit}, quantity={quantity}, id_act={id_act}")
+
+        # Сохранить новые данные в таблицу stok_minus с ссылкой на id акта
+        dbase.save_new_stock_minus(name, price_unit, quantity, id_act)
+
+        # Сохранить id_act в таблицу log
+        dbase.save_id_act_to_log(entry_id, id_act)
+
+
+    return redirect(url_for('edit_entry_act', entry_id=entry_id))
 
 
 @app.route("/stock")
@@ -168,73 +205,6 @@ def save_entry_employees(entry_id):
     dbase.update_entry_employees(entry_id, name, profession)
     return redirect(url_for('showEmployees'))
 
-
-'''
-# Акт выполненных работ/ обработчик запросов для маршрута "/act_form" с методами GET и POST.
-@app.route("/act_form", methods=["GET", "POST"])
-def addAct_foreign_key():
-    if request.method == "GET":
-        # Логика для отображения формы. если  был выполнен HTTP-запрос GET. Если это так, он рендерит HTML-шаблон 'act.html' и отправляет его пользователю.
-        return render_template('act.html', title="Составление акта")
-
-    elif request.method == "POST":  # Если был выполнен HTTP-запрос POST, то:
-        # Получает значения из формы, используя request.form.get() для полей data_order, data_act, и number_car.
-        data_order = request.form.get('data_order')
-        data_act = request.form.get('data_act')
-        number_car = request.form.get('number_car')
-
-        # Создает пустой список rows для хранения данных из строк таблицы.
-        rows = []
-
-      # Итерация над данными формы. Этот цикл проходит по всем ключам, содержащимся в объекте request.form. Объект
-        # request.form содержит все данные, отправленные в форме POST-запроса.
-        for key in request.form.keys():
-            #Этот условный оператор проверяет, начинается ли текущий ключ с "rows[". Это необходимо, чтобы найти поля формы,
-            # которые содержат данные для динамических строк.
-            if key.startswith('rows['):
-
-                # Эта строка разбивает текущий ключ key на четыре части, используя символ [ в качестве разделителя:
-                #
-                #     aaa - первая часть ключа до [
-                #     row_index - индекс строки, извлеченный из ключа
-                #     column_name - название столбца, извлеченное из ключа
-                #     bbb - оставшаяся часть ключа после ]
-                aaa, row_index, column_name, bbb = key.split('[')
-                print('aaa, row_index, column_name, bbb', aaa, row_index, column_name, bbb)
-                row_index = int(row_index.rstrip(']'))  # Эта строка преобразует извлеченный индекс строки из строки
-                # в целое число, удаляя при этом закрывающую скобку ].
-
-                # Этот цикл while гарантирует, что список rows имеет достаточно элементов (словарей), чтобы соответствовать
-                # максимальному индексу строки, найденному в ключах формы. Если списка rows недостаточно, он будет расширен,
-                # добавляя новые пустые словари.
-                while len(rows) <= row_index:
-                    rows.append({})
-
-                # Эта строка добавляет значение поля формы в соответствующий словарь в списке rows. Ключ словаря формируется
-                # из названия столбца, извлеченного из ключа формы, с удалением закрывающей скобки ]. Значение добавляется
-                # с использованием метода getlist(), который возвращает список значений, если поле формы содержит несколько
-                # значений.
-                rows[row_index][column_name.rstrip(']')] = request.form.getlist(key)
-
-
-        print(rows)  # Теперь строки должны содержать структурированные данные
-        # В целом, этот код обрабатывает динамические строки данных, добавленные пользователем в форму, и строит список
-        # словарей rows, где каждый словарь представляет одну строку данных, а ключи словарей - это названия столбцов.
-
-        try:
-            # Добавление данных в таблицу act_foreign_key
-            result = dbase.addAct_foreign_key_db(data_order, data_act, number_car, rows)
-            if result:
-                flash('Данные успешно добавлены', 'success')
-                return redirect(url_for('addAct_foreign_key'))
-            else:
-                flash('Ошибка добавления данных', 'danger')
-        except Exception as e:
-            print(f"Ошибка добавления данных в БД: {str(e)}")
-            flash('Ошибка добавления данных', 'danger')
-
-    return redirect(url_for('addAct_foreign_key'))
-'''
 
 @app.teardown_appcontext
 def close_db(error):

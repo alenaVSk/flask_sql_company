@@ -1,65 +1,61 @@
 {% extends 'base.html' %}
 {% block content %}
-{{ super() }}
-<head>
-    <title>Bootstrap Table Form</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-    <h2>Добавить данные в акт выполненных работ</h2>
-    <form action="{{ url_for('addAct_foreign_key') }}" method="POST" id="actForm">
-        <div class="form-group">
-            <label for="date_order">Дата заявки</label>
-            <input type="text" name="date_order" class="form-control" id="date_order">
-        </div>
-        <div class="form-group">
-            <label for="date_act">Дата акта</label>
-            <input type="text" name="date_act" class="form-control" id="date_act">
-        </div>
-        <div class="form-group">
-            <label for="number_car">Номер машины</label>
-            <input type="text" name="number_car" class="form-control" id="number_car">
-        </div>
 
-        <table id="myTable" class="table table-striped">
+<h2>Составить акт выполненных работ</h2>
+<div style="margin-bottom: 20px;"></div>
+<!-- Пространство -->
+<div class="table-responsive">
+    <!-- адаптивность для таблицы, не будет выходить за пределы контейнера -->
+    <form action="/edit_entry_act/{{ entry_data.id }}" method="post" class="form-contact">
+        <table id="myTable" class="table table-striped max-width: 100%">
             <thead>
                 <tr>
-                    <th scope="col">Материалы</th>
-                    <th scope="col">Стоимость 1ед.</th>
-                    <th scope="col">Количество материалов</th>
-                    <th scope="col">Наименование работ</th>
-                    <th scope="col">Стоимость работ</th>
-                    <th scope="col">Работу выполнил</th>
+                    <th scope="col"></th>
+                    <th scope="col">Дата заказа</th>
+                    <th scope="col">ФИО клиента</th>
+                    <th scope="col">Марка авто</th>
+                    <th scope="col">Год выпуска</th>
+                    <th scope="col">Номер авто</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                <td><input type="text" name="rows[0][materials][]" class="form-control"></td>
-                <td><input type="number" name="rows[0][price_materials][]" class="form-control"></td>
-                <td><input type="number" name="rows[0][quantity][]" class="form-control"></td>
-                <td><input type="text" name="rows[0][work_completed][]" class="form-control"></td>
-                <td><input type="number" name="rows[0][name_work][]" class="form-control"></td>
-                <td><input type="text" name="rows[0][price_work][]" class="form-control"></td>
-            </tr>
+                    <th scope="row"></th>
+                    <td>{{ entry_data.date_order }}</td>
+                    <td>{{ entry_data.name_customer }}</td>
+                    <td>{{ entry_data.brand_car }}</td>
+                    <td>{{ entry_data.year_car }}</td>
+                    <td>{{ entry_data.number_car }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+<h3>Добавить новые данные</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Дата акта вып/работ</th>
+                    <th scope="col">Наименование работ</th>
+                    <th scope="col">Стоимость работ</th>
+                    <th scope="col">Наименование материалов</th>
+                    <th scope="col">Цена за ед.</th>
+                    <th scope="col">Количество</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" name="date_act" class="form-control"></td>
+                    <td><input type="text" name="name_work" class="form-control"></td>
+                    <td><input type="number" name="price_work" class="form-control"></td>
+                    <td><input type="text" name="name" class="form-control"></td>
+                    <td><input type="number" name="price_unit" class="form-control"></td>
+                    <td><input type="number" name="quantity" class="form-control"></td>
+                </tr>
             </tbody>
         </table>
         <button type="button" class="btn btn-primary" onclick="addRow()">Добавить строку</button>
-        <button type="submit" class="btn btn-success">Отправить</button>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+
     </form>
-    <script>
-
-        function addRow() {
-            var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
-            var rowCount = table.rows.length;
-            var newRow = table.insertRow(rowCount);
-            var cols = 6; // Number of columns in the table
-            var colNames = ['materials', 'price_materials', 'quantity', 'work_completed', 'name_work', 'price_work']; // Names of the columns
-            for (var i = 0; i < cols; i++) {
-                var newCell = newRow.insertCell(i);
-                newCell.innerHTML = `<input type="text" class="form-control" name="rows[${rowCount}][${colNames[i]}][]">`;
-            }
-        }
-
-    </script>
-</body>
+</div>
 {% endblock %}

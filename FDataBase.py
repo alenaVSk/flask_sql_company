@@ -1,5 +1,4 @@
 import sqlite3
-#from row_data import process_row_data
 
 
 class FDataBase:
@@ -19,10 +18,10 @@ class FDataBase:
             print("Ошибка чтения из БД")
         return []
 
-    def addCustomer(self, date_order, name_customer, brand_car, year_car, number_car, text_order):
+    def addCustomer(self, date_order, name_customer, brand_car, year_car, number_car, text_order, id_act):
         try:
-            self.__cur.execute("INSERT INTO log VALUES(NULL, ?, ?, ?, ?, ?, ?)",
-                               (date_order, name_customer, brand_car, year_car, number_car, text_order))
+            self.__cur.execute("INSERT INTO log VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)",
+                               (date_order, name_customer, brand_car, year_car, number_car, text_order, id_act))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка добавления статьи в БД " + str(e))
@@ -41,6 +40,7 @@ class FDataBase:
             self.__db.rollback()
 
 
+    # Метод для получения entry_id для перехода из "Журнала" по данной записи
     def get_entry(self, entry_id):
         sql = '''SELECT * FROM log WHERE id = ?'''
         try:
@@ -54,50 +54,105 @@ class FDataBase:
 
 
     # Метод для обновления данных в Журнале
-    def update_entry(self, entry_id, date_order, name_customer, brand_car, year_car, number_car, text_order):
+    def update_entry(self, entry_id, date_order, name_customer, brand_car, year_car, number_car, text_order, id_act):
         try:
             sql = '''UPDATE log 
-                     SET date_order = ?, name_customer = ?, brand_car = ?, year_car = ?, number_car = ?, text_order = ? 
+                     SET date_order = ?, name_customer = ?, brand_car = ?, year_car = ?, number_car = ?, text_order = ?, id_act = ? 
                      WHERE id = ?'''
-            self.__cur.execute(sql, (date_order, name_customer, brand_car, year_car, number_car, text_order, entry_id))
+            self.__cur.execute(sql, (date_order, name_customer, brand_car, year_car, number_car, text_order, id_act, entry_id))
             self.__db.commit()
         except Exception as e:
             print("Ошибка при обновлении записи в БД:", str(e))
             self.__db.rollback()
 
+    # Метод для добавления данных в act вып работ
+    def save_new_act(self, date_act, name_work, price_work):
+        sql = """
+            INSERT INTO act (date_act, name_work, price_work)
+            VALUES (?, ?, ?)
+        """
+        try:
+            self.__cur.execute(sql, (date_act, name_work, price_work))
+            self.__db.commit()
+            return self.__cur.lastrowid  # Возвращаем ID нового акта
+        except Exception as e:
+            print("Ошибка при сохранении новых данных в БД:", str(e))
+            return None
 
-    # Отображение Склада (stock_plus - stock_minus), 71 строка: SUM(sp.quantity) - COALESCE(SUM(sm.quantity), 0) AS quantity_total,
+    # Метод для добавления данных в stock_minus через акт вып работ
+    def save_new_stock_minus(self, name, price_unit, quantity, id_act):
+        sql = """
+            INSERT INTO stock_minus (name, price_unit, quantity, id_act)
+            VALUES (?, ?, ?, ?)
+        """
+        try:
+            self.__cur.execute(sql, (name, price_unit, quantity, id_act))
+            self.__db.commit()
+        except Exception as e:
+            print("Ошибка при сохранении новых данных в БД:", str(e))
+
+    # Метод для добавления номера акта в Журнал
+    def save_id_act_to_log(self, entry_id, id_act):
+        # Получаем текущую запись по entry_id
+        entry = self.get_entry(entry_id)
+
+        if entry:
+            # Дополняем текущую запись id_act и обновляем её
+            id_act_old = entry.get('id_act')
+            if id_act_old is not None:
+                id_act_new = f"{id_act_old} {id_act}"
+            else:
+                id_act_new = str(id_act)
+
+            sql_update = """
+                UPDATE log
+                SET id_act = ?
+                WHERE id = ?
+            """
+            try:
+                self.__cur.execute(sql_update, (id_act_new, entry_id))
+                self.__db.commit()
+                print(f"ID акта {id_act} успешно добавлен к записи в таблице log с id {entry_id}")
+            except Exception as e:
+                print("Ошибка при обновлении записи в таблице log:", str(e))
+        else:
+            print(f"Запись с id {entry_id} не найдена в таблице log")
+
+
+    # Отображение Склада
     def getStock(self):
-        print('getStock quantity, quantity_totalFFF', self)
         sql = '''SELECT 
-                    sp.name AS name_total,
-                    SUM(sp.quantity) - COALESCE(SUM(sm.quantity), 0) AS quantity_total,
-	                sp.price_unit AS price_unit_total
-                 FROM 
-                    stock_plus sp
-                    LEFT JOIN 
-                    stock_minus sm ON sp.name = sm.name AND sp.price_unit = sm.price_unit
-                 GROUP BY 
-                    sp.name, sp.price_unit;'''
+                 sp.name AS name_total,
+                 IFNULL (sp.quantity, 0) - IFNULL (sm.quantity, 0) AS quantity_total,
+                 sp.price_unit AS price_unit_total
+                 FROM (SELECT SUM (quantity) AS quantity, name, price_unit
+                    FROM stock_plus
+                    GROUP BY 
+                    name, price_unit) sp
+                 
+                 LEFT JOIN 
+                    (SELECT SUM (quantity) AS quantity, name, price_unit
+                    FROM stock_minus
+                    GROUP BY 
+                    name, price_unit) sm
+                 ON sp.name = sm.name AND sp.price_unit = sm.price_unit;'''
+
         try:
             self.__cur.execute(sql)
             res = self.__cur.fetchall()
             # Преобразование каждой строки в список значений
             stock_list = [dict(row) for row in res]
-            print('stock_listFFF', stock_list)
-            if stock_list:
-                return stock_list
+            return stock_list
         except sqlite3.Error as e:
             print("Ошибка добавления статьи в БД " + str(e))
         return []
 
+    # Метод для добавления в stock_plus
     def addStock(self, name, quantity, price_unit):
         try:
             self.__cur.execute("""
                 INSERT INTO stock_plus (name, quantity, price_unit) 
-                VALUES (?, ?, ?)
-                ON CONFLICT(name, price_unit) DO UPDATE 
-                SET quantity = quantity + EXCLUDED.quantity;
+                VALUES (?, ?, ?);
                 """, (name, quantity, price_unit))
             self.__db.commit()
         except sqlite3.Error as e:
