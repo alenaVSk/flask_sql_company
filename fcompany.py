@@ -106,6 +106,7 @@ def save_entry(entry_id):
     dbase.update_entry(entry_id, date_order, name_customer, brand_car, year_car, number_car, text_order, id_act)
     return redirect(url_for('showZhurnal'))
 
+
 # Маршрут для составления акта (получение данных из "Журнала" по id)
 @app.route('/edit_entry_act/<int:entry_id>', methods=['GET'])
 def edit_entry_act(entry_id):
@@ -114,30 +115,24 @@ def edit_entry_act(entry_id):
 
     return render_template('act.html', title="Составить акт выполненных работ", entry_data=entry_data)
 
+
 # Маршрут для добавления данных в акт
 @app.route('/edit_entry_act/<int:entry_id>', methods=['POST'])
 def save_new_act(entry_id):
     # Получить данные из формы
-    date_act = request.form.get('date_act')
-    name_work = request.form.get('name_work')
-    price_work = request.form.get('price_work')
-    name = request.form.get('name')
-    price_unit = request.form.get('price_unit')
-    quantity = request.form.get('quantity')
+    id_acts = request.form.getlist('id_act[]')
+    date_acts = request.form.getlist('date_act[]')
+    name_works = request.form.getlist('name_work[]')
+    price_works = request.form.getlist('price_work[]')
+    names = request.form.getlist('name[]')
+    price_units = request.form.getlist('price_unit[]')
+    quantities = request.form.getlist('quantity[]')
 
-    # Сохранить новые данные в таблицу act и получить id нового акта
-    id_act = dbase.save_new_act(date_act, name_work, price_work)
-
-    if id_act is not None:
-        #print(f"Новый акт сохраняется с id: {id_act}")
-        #print(f"Сохранение в stock_minus: name={name}, price_unit={price_unit}, quantity={quantity}, id_act={id_act}")
-
-        # Сохранить новые данные в таблицу stok_minus с ссылкой на id акта
-        dbase.save_new_stock_minus(name, price_unit, quantity, id_act)
-
-        # Сохранить id_act в таблицу log
-        dbase.save_id_act_to_log(entry_id, id_act)
-
+    # проверяем, что длина всех списков одинакова
+    for i in range(len(id_acts)):
+        dbase.save_new_act(id_acts[i], date_acts[i], name_works[i], price_works[i])
+        dbase.save_new_stock_minus(names[i], price_units[i], quantities[i], id_acts[i])
+        dbase.save_id_act_to_log(id_acts[i], entry_id)
 
     return redirect(url_for('edit_entry_act', entry_id=entry_id))
 

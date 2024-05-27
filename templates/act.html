@@ -30,32 +30,62 @@
             </tbody>
         </table>
 
-<h3>Добавить новые данные</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Дата акта вып/работ</th>
-                    <th scope="col">Наименование работ</th>
-                    <th scope="col">Стоимость работ</th>
-                    <th scope="col">Наименование материалов</th>
-                    <th scope="col">Цена за ед.</th>
-                    <th scope="col">Количество</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="text" name="date_act" class="form-control"></td>
-                    <td><input type="text" name="name_work" class="form-control"></td>
-                    <td><input type="number" name="price_work" class="form-control"></td>
-                    <td><input type="text" name="name" class="form-control"></td>
-                    <td><input type="number" name="price_unit" class="form-control"></td>
-                    <td><input type="number" name="quantity" class="form-control"></td>
-                </tr>
-            </tbody>
-        </table>
-        <button type="button" class="btn btn-primary" onclick="addRow()">Добавить строку</button>
-        <button type="submit" class="btn btn-primary">Сохранить</button>
 
-    </form>
+<h3>Добавить новые данные</h3>
+
+        <table id="newDataTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Номер акта</th>
+                <th scope="col">Дата акта</th>
+                <th scope="col">Наименование работ</th>
+                <th scope="col">Стоимость работ</th>
+                <th scope="col">Наименование материалов</th>
+                <th scope="col">Цена за ед.</th>
+                <th scope="col">Количество</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" name="id_act[]" class="form-control" style="width: 100px;" ></td>
+                <td><input type="text" name="date_act[]" class="form-control"></td>
+                <td><input type="text" name="name_work[]" class="form-control" style="width: 300px;" ></td>
+                <td><input type="number" name="price_work[]" class="form-control"></td>
+                <td><input type="text" name="name[]" class="form-control" style="width: 300px;" ></td>
+                <td><input type="number" name="price_unit[]" class="form-control"></td>
+                <td><input type="number" name="quantity[]" class="form-control" style="width: 100px;"></td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-primary" onclick="addRow()">Добавить строку</button>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
 </div>
+
+<script>
+function addRow() {
+    var table = document.getElementById("newDataTable").getElementsByTagName('tbody')[0];
+    var newRow = table.insertRow();
+
+    var columns = [
+        { name: 'id_act[]', type: 'number' },
+        { name: 'date_act[]', type: 'text' },
+        { name: 'name_work[]', type: 'text' },
+        { name: 'price_work[]', type: 'number' },
+        { name: 'name[]', type: 'text' },
+        { name: 'price_unit[]', type: 'number' },
+        { name: 'quantity[]', type: 'number' }
+    ];
+
+    for (var i = 0; i < columns.length; i++) {
+        var newCell = newRow.insertCell(i);
+        var input = document.createElement("input");
+        input.type = columns[i].type;
+        input.name = columns[i].name;
+        input.className = "form-control";
+        newCell.appendChild(input);
+    }
+}
+</script>
+
 {% endblock %}

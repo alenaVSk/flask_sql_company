@@ -7,7 +7,16 @@ year_car text NOT NULL,
 number_car text NOT NULL,
 text_order text NOT NULL,
 id_act integer
-FOREIGN KEY (id_act) REFERENCES act (id)
+);
+
+
+CREATE TABLE IF NOT EXISTS act (
+id integer PRIMARY KEY AUTOINCREMENT,
+id_act integer NOT NULL,
+date_act text NOT NULL,
+name_work text NOT NULL,
+price_work integer NOT NULL,
+FOREIGN KEY (id_act) REFERENCES log (id_act)
 );
 
 
@@ -25,7 +34,7 @@ name TEXT NOT NULL,
 quantity INTEGER NOT NULL,
 price_unit INTEGER NOT NULL,
 id_act INTEGER NOT NULL,
-FOREIGN KEY (id_act) REFERENCES act(id)
+FOREIGN KEY (id_act) REFERENCES act(id_act)
 );
 
 CREATE TABLE IF NOT EXISTS employees (
@@ -34,10 +43,5 @@ name text NOT NULL,
 profession text NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS act (
-id integer PRIMARY KEY AUTOINCREMENT,
-date_act text NOT NULL,
-name_work text NOT NULL,
-price_work integer NOT NULL
-);
+
 
