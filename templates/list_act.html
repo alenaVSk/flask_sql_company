@@ -3,13 +3,14 @@
 {% block content %}
 
 
-<h2>Журнал заказов</h2>
+<h2>Реестр актов выполненных работ</h2>
+
 <div style="margin-bottom: 20px;"></div> <!-- Пространство -->
 
 <!-- Форма поиска -->
-<form class="d-flex" role="search">
+<form class="d-flex" role="search" action="/" method="get">
   <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
-  <button class="btn btn-outline-success narrow-button" type="submit">Вернуться к журналу</button>
+  <button class="btn btn-outline-success narrow-button" type="button" id="resetButton">Вернуться к реестру</button>
 </form>
 
 <div style="margin-bottom: 20px;"></div> <!-- Пространство -->
@@ -19,43 +20,36 @@
 
   <thead>
     <tr>
-      <th scope="col"></th>
-      <th scope="col">Дата заказа</th>
-      <th scope="col">ФИО клиента</th>
-      <th scope="col">Марка авто</th>
-      <th scope="col">Год выпуска</th>
+      <th scope="col" style="width: 50px;">Номер акта</th>
+      <th scope="col">Дата акта</th>
+      <th scope="col" style="width: 200px;">ФИО клиента</th>
+      <th scope="col" style="width: 200px;">Марка авто</th>
+      <th scope="col" style="width: 50px;">Год выпуска</th>
       <th scope="col">Номер авто</th>
-      <th scope="col">Причина обращения</th>
-      <th scope="col">Номер акта</th>
+      <th scope="col" style="width: 50px;">Стоимость работ</th>
+      <th scope="col" style="width: 50px;">Стоимость материалов</th>
+      <th scope="col" style="width: 50px;">Итоговая стоимость</th>
+
     </tr>
   </thead>
   <tbody>
-    {% for row in log %}
+    {% for row in list_act %}
     <tr>
-      <th scope="row">{{ loop.index }}</th> <!-- Используем loop.index для нумерации строк -->
-      <td>{{ row.date_order }}</td>
-      <td>{{ row.name_customer }}</td>
-      <td>{{ row.brand_car }}</td>
-      <td>{{ row.year_car }}</td>
-      <td>{{ row.number_car }}</td>
-      <td>{{ row.text_order }}</td>
-      <td>{{ row.id_act }}</td>
-      <td>
-          <a href="/edit_entry_act/{{ row.id }}" class="btn btn-outline-primary btn-sm">Создать акт</a>
-      </td>
-
-      <td>
-          <a href="/edit_entry/{{ row.id }}" class="btn btn-outline-primary btn-sm">Изменить</a>
-      </td>
-
-      <td>
-        <!-- форма кнопки "Удалить", она отправляет POST-запрос на сервер с идентификатором записи, которую нужно удалить.-->
-        <form action="/delete_entry/{{ row.id }}" method="post">
-            <button type="submit" class="btn btn-outline-danger btn-sm">Удалить</button>
-        </form>
-      </td>
+        <td>{{ row.id_act }}</td>
+        <td>{{ row.date_act }}</td>
+        <td>{{ row.name_customer }}</td>
+        <td>{{ row.brand_car }}</td>
+        <td>{{ row.year_car }}</td>
+        <td>{{ row.number_car }}</td>
+        <td>{{ row.total_work }}</td>
+        <td>{{ row.total_materials }}</td>
+        <td>{{ row.total_price }}</td>
+        <td>
+            <a href="/edit_entry_act/{{ row[0] }}" class="btn btn-outline-primary btn-sm">Открыть акт</a>
+        </td>
     </tr>
     {% endfor %}
+
   </tbody>
 </table>
 </div>
@@ -70,11 +64,23 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function() {
+    // Событие для фильтрации таблицы при вводе текста
     $("#searchInput").on("keyup", function() {
       var value = $(this).val().toLowerCase();
+      filterTable(value);
+    });
+
+    // Функция фильтрации таблицы
+    function filterTable(value) {
       $("#myTable tbody tr").filter(function() {
         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
       });
+    }
+
+    // Сброс фильтрации и поля поиска
+    $("#resetButton").on("click", function() {
+      $("#searchInput").val('');
+      filterTable('');
     });
   });
 </script>
@@ -84,7 +90,7 @@
 <script>
   $(document).ready(function() {
     var currentPage = 1;
-    var rowsPerPage = 12; // Количество строк на одной странице
+    var rowsPerPage = 5; // Количество строк на одной странице
 
     // Показать нужные строки при загрузке страницы
     showRows(currentPage, rowsPerPage);
@@ -133,5 +139,8 @@
     }
   });
 </script>
+</body>
+
+
 
 {% endblock %}

@@ -18,6 +18,7 @@ class FDataBase:
             print("Ошибка чтения из БД")
         return []
 
+
     def addCustomer(self, date_order, name_customer, brand_car, year_car, number_car, text_order, id_act):
         try:
             self.__cur.execute("INSERT INTO log VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)",
@@ -104,6 +105,69 @@ class FDataBase:
             self.__db.commit()
         except Exception as e:
             print("Ошибка при обновлении записи в таблице log:", str(e))
+
+
+    def getList_act(self):
+        sql = '''SELECT 
+                log.id_act,
+                act.date_act,
+                log.name_customer,
+                log.brand_car,
+                log.year_car,
+                log.number_car,
+                SUM(act.price_work) AS total_work,
+                (
+                    SELECT 
+                        SUM(stock_minus.price_unit * stock_minus.quantity)
+                    FROM 
+                        stock_minus
+                    WHERE 
+                        stock_minus.id_act = log.id_act
+                ) AS total_materials,
+                (
+                    SUM(act.price_work) +
+                    (
+                        SELECT 
+                            SUM(stock_minus.price_unit * stock_minus.quantity)
+                        FROM 
+                            stock_minus
+                        WHERE 
+                            stock_minus.id_act = log.id_act
+                    )
+                ) AS total_price
+            FROM 
+                log
+            JOIN 
+                act ON log.id_act = act.id_act
+            GROUP BY 
+                log.id_act,
+                act.date_act,
+                log.name_customer,
+                log.brand_car,
+                log.year_car,
+                log.number_car;'''
+        try:
+            self.__cur.execute(sql)
+            res = self.__cur.fetchall()
+            # Преобразование каждой строки в список словарей с использованием ключей
+            list_act_list = [
+                {
+                    'id_act': row[0],
+                    'date_act': row[1],
+                    'name_customer': row[2],
+                    'brand_car': row[3],
+                    'year_car': row[4],
+                    'number_car': row[5],
+                    'total_work': row[6],
+                    'total_materials': row[7],
+                    'total_price': row[8]
+                } for row in res
+            ]
+            if list_act_list:
+                return list_act_list
+        except Exception as e:
+            print(f"Ошибка чтения из БД: {e}")
+        return []
 
 
     # Отображение Склада
