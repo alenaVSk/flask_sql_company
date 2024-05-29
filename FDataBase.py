@@ -41,7 +41,7 @@ class FDataBase:
             self.__db.rollback()
 
 
-    # Метод для получения entry_id для перехода из "Журнала" по данной записи
+    # Метод для перехода из "Журнала" по данной записи (по entry_id)
     def get_entry(self, entry_id):
         sql = '''SELECT * FROM log WHERE id = ?'''
         try:
@@ -94,7 +94,9 @@ class FDataBase:
 
 
     # Метод для добавления данных в log по entry_id
-    def save_id_act_to_log(self, entry_id, id_act):
+    def save_id_act_to_log(self, id_act, entry_id):
+        print('FD entry_id, id_act', id_act, entry_id)
+        print('FD id_act', id_act)
         sql = """
             UPDATE log
             SET id_act = ?
@@ -106,7 +108,7 @@ class FDataBase:
         except Exception as e:
             print("Ошибка при обновлении записи в таблице log:", str(e))
 
-
+    # Метод для отображения Реестра актов
     def getList_act(self):
         sql = '''SELECT 
                 log.id_act,
@@ -169,6 +171,92 @@ class FDataBase:
             print(f"Ошибка чтения из БД: {e}")
         return []
 
+        # Метод для перехода из "Реестра актов" по данной записи (по entry_id)
+
+    def get_final_act(self, entry_id):
+        sql_main = '''
+        SELECT 
+            log.id_act,
+            act.date_act,
+            log.name_customer,
+            log.brand_car,
+            log.year_car,
+            log.number_car,
+            SUM(act.price_work) AS total_work,
+            (
+                SELECT 
+                    SUM(stock_minus.price_unit * stock_minus.quantity)
+                FROM 
+                    stock_minus
+                WHERE 
+                    stock_minus.id_act = log.id_act
+            ) AS total_materials,
+            (
+                SUM(act.price_work) +
+                (
+                    SELECT 
+                        SUM(stock_minus.price_unit * stock_minus.quantity)
+                    FROM 
+                        stock_minus
+                    WHERE 
+                        stock_minus.id_act = log.id_act
+                )
+            ) AS total_price
+        FROM 
+            log
+        JOIN 
+            act ON log.id_act = act.id_act
+        WHERE 
+            log.id_act = ?
+        GROUP BY 
+            log.id_act,
+            act.date_act,
+            log.name_customer,
+            log.brand_car,
+            log.year_car,
+            log.number_car
+        '''
+
+        sql_works = '''
+        SELECT 
+            act.name_work,
+            act.price_work
+        FROM 
+            act
+        WHERE 
+            act.id_act = ?
+        '''
+
+        sql_materials = '''
+        SELECT 
+            stock_minus.name,
+            stock_minus.price_unit,
+            stock_minus.quantity
+        FROM 
+            stock_minus
+        WHERE 
+            stock_minus.id_act = ?
+        '''
+
+        try:
+            self.__cur.execute(sql_main, (entry_id,))
+            main_data = self.__cur.fetchone()
+
+            self.__cur.execute(sql_works, (entry_id,))
+            works_data = self.__cur.fetchall()
+
+            self.__cur.execute(sql_materials, (entry_id,))
+            materials_data = self.__cur.fetchall()
+
+            if main_data:
+                return {
+                    'main': dict(main_data),
+                    'works': [dict(row) for row in works_data],
+                    'materials': [dict(row) for row in materials_data]
+                }
+        except Exception as e:
+            print("Ошибка при получении записи из БД:", str(e))
+        return None
 
     # Отображение Склада
     def getStock(self):

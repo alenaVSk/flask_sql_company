@@ -132,34 +132,25 @@ def save_new_act(entry_id):
     for i in range(len(id_acts)):
         dbase.save_new_act(id_acts[i], date_acts[i], name_works[i], price_works[i])
         dbase.save_new_stock_minus(names[i], price_units[i], quantities[i], id_acts[i])
+        print('fc id_acts[i], entry_id', id_acts[i], entry_id)
+        print('fc id_acts[i]', id_acts[i])
         dbase.save_id_act_to_log(id_acts[i], entry_id)
 
     return redirect(url_for('edit_entry_act', entry_id=entry_id))
 
-# Маршрут для перехода из реестра для составления акта
-@app.route('/edit_entry_list_act', methods=['POST'])
-def save_new_list_act():
-    # Получить данные из формы
-    id_acts = request.form.getlist('id_act[]')
-    date_acts = request.form.getlist('date_act[]')
-    name_works = request.form.getlist('name_work[]')
-    price_works = request.form.getlist('price_work[]')
-    names = request.form.getlist('name[]')
-    price_units = request.form.getlist('price_unit[]')
-    quantities = request.form.getlist('quantity[]')
-
-    # проверяем, что длина всех списков одинакова
-    for i in range(len(id_acts)):
-        dbase.save_new_act(id_acts[i], date_acts[i], name_works[i], price_works[i])
-        dbase.save_new_stock_minus(names[i], price_units[i], quantities[i], id_acts[i])
-        dbase.save_id_act_to_log(id_acts[i])
-
-    return redirect(url_for('edit_entry_act', entry_id=entry_id))
 # Маршрут для перехода в реестр актов
 @app.route("/list_act")
-def showLis_act():
+def showList_act():
+
     return render_template("list_act.html", title="Реестр", list_act=dbase.getList_act())
 
+# Маршрут для отображения финального акта (получение данных из "Реестра" по id)
+@app.route('/final_act/<int:entry_id>', methods=['GET'])
+def showFinal_act(entry_id):
+    entry_data = dbase.get_final_act(entry_id)
+    #print(entry_id, entry_data)  # Проверка, получены ли данные
+
+    return render_template('final_act.html', title="Акт выполненных работ", entry_data=entry_data)
 
 @app.route("/stock")
 def showStock():

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Акт выполненных работ № {{ entry_data.main.id_act }}<span style="font-family: 'Arial', sans-serif; font-size: 26px;">
+    от {{ entry_data.main.date_act }}</span></h2>
+
+<div style="margin-bottom: 20px;"></div>
+<!-- Пространство -->
+<div class="table-responsive">
+    <!-- адаптивность для таблицы, не будет выходить за пределы контейнера -->
+
+    <table id="myTable" class="table table-striped max-width: 100%">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">ФИО клиента</th>
+                <th scope="col">Марка авто</th>
+                <th scope="col">Год выпуска</th>
+                <th scope="col">Номер авто</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row"></th>
+                <td>{{ entry_data.main.name_customer }}</td>
+                <td>{{ entry_data.main.brand_car }}</td>
+                <td>{{ entry_data.main.year_car }}</td>
+                <td>{{ entry_data.main.number_car }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4>Выполненные работы:</h4>
+
+<div class="table-responsive">
+    <table id="workTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col" >Наименование работ</th> <!-- Настроим ширину колонок -->
+                <th scope="col" >Стоимость работ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for work in entry_data.works %}
+            <tr>
+                <td><input type="text" name="name_work[]" class="form-control" value="{{ work.name_work }}"  readonly></td>
+                <td><input type="number" name="price_work[]" class="form-control" value="{{ work.price_work }}" readonly></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="totals">
+            <p>Общая стоимость работ: {{ entry_data.main.total_work }} руб.</p>
+        </div>
+<h4>Использованные материалы:</h4>
+
+<div class="table-responsive">
+    <table id="materialTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col" >Наименование материалов</th> <!-- Настроим ширину колонок -->
+                <th scope="col" >Цена за ед.</th>
+                <th scope="col" >Количество</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for material in entry_data.materials %}
+            <tr>
+                <td><input type="text" name="name[]" class="form-control" value="{{ material.name }}"  readonly></td>
+                <td><input type="number" name="price_unit[]" class="form-control" value="{{ material.price_unit }}" readonly></td>
+                <td><input type="number" name="quantity[]" class="form-control" value="{{ material.quantity }}"  readonly></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="totals">
+    <p>Общая стоимость материалов: {{ entry_data.main.total_materials }} руб.</p>
+    <h4>Итоговая стоимость: {{ entry_data.main.total_price }} руб.</h4>
+</div>
+
+{% endblock %}
+

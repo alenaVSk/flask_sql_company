@@ -10,6 +10,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
     <link type="text/css" href="{{ url_for('static', filename='css/styles.css')}}" rel="stylesheet" />
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Подключаем файл стилей -->
+
 {% block title -%}
 {% if title %}
          <title>Drive Avto-{{title}}</title>

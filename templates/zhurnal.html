@@ -2,7 +2,6 @@
 
 {% block content %}
 
-
 <h2>Журнал заказов</h2>
 <div style="margin-bottom: 20px;"></div> <!-- Пространство -->
 
@@ -84,7 +83,7 @@
 <script>
   $(document).ready(function() {
     var currentPage = 1;
-    var rowsPerPage = 12; // Количество строк на одной странице
+    var rowsPerPage = 10; // Количество строк на одной странице
 
     // Показать нужные строки при загрузке страницы
     showRows(currentPage, rowsPerPage);

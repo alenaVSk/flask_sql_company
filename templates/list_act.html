@@ -2,7 +2,6 @@
 
 {% block content %}
 
-
 <h2>Реестр актов выполненных работ</h2>
 
 <div style="margin-bottom: 20px;"></div> <!-- Пространство -->
@@ -45,7 +44,7 @@
         <td>{{ row.total_materials }}</td>
         <td>{{ row.total_price }}</td>
         <td>
-            <a href="/edit_entry_act/{{ row[0] }}" class="btn btn-outline-primary btn-sm">Открыть акт</a>
+            <a href="/final_act/{{ row.id_act }}" class="btn btn-outline-primary btn-sm">Открыть акт</a>
         </td>
     </tr>
     {% endfor %}
@@ -90,7 +89,7 @@
 <script>
   $(document).ready(function() {
     var currentPage = 1;
-    var rowsPerPage = 5; // Количество строк на одной странице
+    var rowsPerPage = 10; // Количество строк на одной странице
 
     // Показать нужные строки при загрузке страницы
     showRows(currentPage, rowsPerPage);
@@ -139,8 +138,5 @@
     }
   });
 </script>
-</body>
-
-
 
 {% endblock %}
