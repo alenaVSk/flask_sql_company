@@ -216,6 +216,11 @@ def save_entry_employees(entry_id):
     return redirect(url_for('showEmployees'))
 
 
+@app.route('/requisites')
+def requisites():
+    return render_template('requisites.html')
+
+
 @app.teardown_appcontext
 def close_db(error):
     '''Закрываем соединение с БД, если оно было установлено'''

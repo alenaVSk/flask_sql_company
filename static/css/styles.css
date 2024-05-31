@@ -93,9 +93,26 @@ div.content {
 	background: #FF9C9C;
 }
 
-.bordered-text {
-        border: 1px solid #000; /* цвет рамки и толщина */
-        padding: 10px; /* отступ внутри рамки */
-        width: 300px; /* ширина рамки */
-    }
+/* контейнер для 3 кнопок (добавить строку, сохранить, вернуться..) */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.btn {
+    margin-bottom: 10px;
+}
 
+/* Стили для уменьшения размера строки поиска и кнопки */
+.narrow-search {
+    height: 35px; /* Уменьшение высоты поля ввода */
+    font-size: 14px; /* Уменьшение размера шрифта */
+    padding: 5px 10px; /* Уменьшение внутреннего отступа */
+}
+
+.narrow-button {
+    height: 35px; /* Уменьшение высоты кнопки */
+    font-size: 14px; /* Уменьшение размера шрифта */
+    padding: 5px 10px; /* Уменьшение внутреннего отступа */
+    line-height: 1.5; /* Регулировка высоты строки текста */
+}

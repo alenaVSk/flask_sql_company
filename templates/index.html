@@ -2,21 +2,31 @@
 
 {% block content %}
 
-<div class="bordered-text">
-    <p>Реквизиты:</p>
-    <p>ООО "Drive Avto"</p>
-    <p>г.Волковыск</p>
-    <p>ул.Весенняя, 10</p>
-    <p>р/с 5127846355124</p>
-    <p>Авто-Банк</p>
+<nav class="nav flex-column">
 
-</div>
-<div style="margin-bottom: 20px;"></div>
+  <div class="breadcrumb-item" style="font-size: 1.2em;">Заказы</div>
+  <a class="nav-link active" style="font-size: 1.2em;" href="/zhurnal">Журнал заказов</a>
+  <a class="nav-link" style="font-size: 1.2em;" href="/add_customer">Добавить данные в журнал</a>
+  <a class="nav-link active" style="font-size: 1.2em;" href= "#"></a>
 
+  <div class="breadcrumb-item" style="font-size: 1.2em;">Акт выполненных работ</div>
+  <a class="nav-link active" style="font-size: 1.2em;" href="/list_act">Реестр актов выполненных работ</a>
+  <a class="nav-link active" style="font-size: 1.2em;" href="#"></a>
 
-<p>Директор Васечкин Александр Васильевич  +315 45 8452167</p>
-<p>Главный бухгалтер Маркова Анастасия Ивановна  +315 45 8421478</p>
-<p>Мастер участка № 1 Иванов Иван Иванович  +315 45 6989621</p>
-<p>Мастер участка № 2 Петров Петр Петрович  +315 45 5477125</p>
-<p></p>
+  <div class="breadcrumb-item" style="font-size: 1.2em;">Материалы</div>
+  <a class="nav-link active" style="font-size: 1.2em;" href="/stock">Склад</a>
+  <a class="nav-link active" style="font-size: 1.2em;" href="/add_stock">Добавить материалы на склад</a>
+  <a class="nav-link active" style="font-size: 1.2em;" href= "#"></a>
+
+  <div class="breadcrumb-item" style="font-size: 1.2em;">Сотрудники</div>
+  <a class="nav-link active" style="font-size: 1.2em;" href="/employees">Список сотрудников</a>
+  <a class="nav-link active" style="font-size: 1.2em;" href="/add_employees">Добавить сотрудника в список</a>
+  <a class="nav-link active" style="font-size: 1.2em;" href= "#"></a>
+
+  <div class="breadcrumb-item" style="font-size: 1.2em;">Разное</div>
+  <a class="nav-link active" style="font-size: 1.2em;" href="/requisites">Реквизиты</a>
+  <a class="nav-link active" style="font-size: 1.2em;" href= "#"></a>
+
+</nav>
+
 {% endblock %}

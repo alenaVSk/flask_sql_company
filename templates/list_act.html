@@ -9,7 +9,7 @@
 <!-- Форма поиска -->
 <form class="d-flex" role="search" action="/" method="get">
   <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
-  <button class="btn btn-outline-success narrow-button" type="button" id="resetButton">Вернуться к реестру</button>
+  <button class="btn btn-outline-success narrow-button" type="button" id="resetButton">Вернуться к "Реестр"</button>
 </form>
 
 <div style="margin-bottom: 20px;"></div> <!-- Пространство -->
@@ -25,9 +25,9 @@
       <th scope="col" style="width: 200px;">Марка авто</th>
       <th scope="col" style="width: 50px;">Год выпуска</th>
       <th scope="col">Номер авто</th>
-      <th scope="col" style="width: 50px;">Стоимость работ</th>
-      <th scope="col" style="width: 50px;">Стоимость материалов</th>
-      <th scope="col" style="width: 50px;">Итоговая стоимость</th>
+      <th scope="col" style="width: 50px;">Стоимость работ(руб)</th>
+      <th scope="col" style="width: 50px;">Стоимость материалов(руб)</th>
+      <th scope="col" style="width: 50px;">Итоговая стоимость(руб)</th>
 
     </tr>
   </thead>
@@ -40,9 +40,9 @@
         <td>{{ row.brand_car }}</td>
         <td>{{ row.year_car }}</td>
         <td>{{ row.number_car }}</td>
-        <td>{{ row.total_work }}</td>
-        <td>{{ row.total_materials }}</td>
-        <td>{{ row.total_price }}</td>
+        <td>{{ ( '%.2f' % (row.total_work / 100) ) | replace('.', ',') }}</td>
+        <td>{{ ( '%.2f' % (row.total_materials / 100) ) | replace('.', ',') }}</td>
+        <td>{{ ( '%.2f' % (row.total_price / 100) ) | replace('.', ',') }}</td>
         <td>
             <a href="/final_act/{{ row.id_act }}" class="btn btn-outline-primary btn-sm">Открыть акт</a>
         </td>

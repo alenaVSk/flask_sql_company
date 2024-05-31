@@ -12,7 +12,11 @@
     <label for="profession">Профессия:</label>
     <input type="text" id="profession" name="profession" value="{{ entry_data.profession }}" class="form-contact" required ><br><br>
 
-    <button type="submit">Сохранить</button>
+<div class="container">
+    <button type="submit" class="btn btn-outline-primary">Сохранить</button>
+    <button type="button" class="btn btn-outline-success return-button" onclick="window.location.href = '/employees'">Вернуться к "Список сотрудников"</button>
+</div>
+
 </form>
 
 {% endblock %}

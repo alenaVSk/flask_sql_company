@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h2>Акт выполненных работ № {{ entry_data.main.id_act }}<span style="font-family: 'Arial', sans-serif; font-size: 26px;">
+<h2>Акт выполненных работ  № {{ entry_data.main.id_act }}<span style="font-family: 'Arial', sans-serif; font-size: 27px;">
     от {{ entry_data.main.date_act }}</span></h2>
 
 <div style="margin-bottom: 20px;"></div>
@@ -39,21 +39,21 @@
         <thead>
             <tr>
                 <th scope="col" >Наименование работ</th> <!-- Настроим ширину колонок -->
-                <th scope="col" >Стоимость работ</th>
+                <th scope="col" >Стоимость работ (руб)</th>
             </tr>
         </thead>
         <tbody>
             {% for work in entry_data.works %}
             <tr>
                 <td><input type="text" name="name_work[]" class="form-control" value="{{ work.name_work }}"  readonly></td>
-                <td><input type="number" name="price_work[]" class="form-control" value="{{ work.price_work }}" readonly></td>
+                <td><input type="number" name="price_work[]" class="form-control" value="{{ ('%.2f' % (work.price_work / 100) ) | replace('.', ',') }}" readonly></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 <div class="totals">
-            <p>Общая стоимость работ: {{ entry_data.main.total_work }} руб.</p>
+            <p>Общая стоимость работ: {{ ( '%.2f' % (entry_data.main.total_work / 100) ) | replace('.', ',') }} руб.</p>
         </div>
 <h4>Использованные материалы:</h4>
 
@@ -62,7 +62,7 @@
         <thead>
             <tr>
                 <th scope="col" >Наименование материалов</th> <!-- Настроим ширину колонок -->
-                <th scope="col" >Цена за ед.</th>
+                <th scope="col" >Цена за ед (руб)</th>
                 <th scope="col" >Количество</th>
             </tr>
         </thead>
@@ -71,7 +71,7 @@
             {% for material in entry_data.materials %}
             <tr>
                 <td><input type="text" name="name[]" class="form-control" value="{{ material.name }}"  readonly></td>
-                <td><input type="number" name="price_unit[]" class="form-control" value="{{ material.price_unit }}" readonly></td>
+                <td><input type="number" name="price_unit[]" class="form-control" value="{{ ( '%.2f' % (material.price_unit / 100) ) | replace('.', ',') }}" readonly></td>
                 <td><input type="number" name="quantity[]" class="form-control" value="{{ material.quantity }}"  readonly></td>
             </tr>
             {% endfor %}
@@ -80,8 +80,12 @@
 </div>
 
 <div class="totals">
-    <p>Общая стоимость материалов: {{ entry_data.main.total_materials }} руб.</p>
-    <h4>Итоговая стоимость: {{ entry_data.main.total_price }} руб.</h4>
+    <p>Общая стоимость материалов: {{ ( '%.2f' % (entry_data.main.total_materials / 100) ) | replace('.', ',') }} руб.</p>
+    <h4>Итоговая стоимость: {{ ( '%.2f' % (entry_data.main.total_price / 100) ) | replace('.', ',') }} руб.</h4>
+</div>
+
+<div class="container">
+        <button type="button" class="btn btn-outline-success return-button" onclick="window.location.href = '/list_act'">Вернуться к "Реестр"</button>
 </div>
 
 {% endblock %}

@@ -11,7 +11,12 @@
 <form action="{{url_for('addEmployees')}}" method="post" class="form-contact">
 <p><label>ФИО сотрудника: </label> <input type="text" name="name" value="" required />
 <p><label>Должность: </label> <input type="text" name="profession" value="" required />
-<p><input type="submit" value="Добавить" />
+
+<div class="container">
+    <button type="submit" class="btn btn-outline-primary">Сохранить</button>
+    <button type="button" class="btn btn-outline-success return-button" onclick="window.location.href = '/employees'">Вернуться к "Список сотрудников"</button>
+</div>
+
 </form>
 
 {% endblock %}

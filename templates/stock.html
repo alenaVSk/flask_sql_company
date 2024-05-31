@@ -8,7 +8,7 @@
 <!-- Форма поиска -->
 <form class="d-flex" role="search">
   <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
-  <button class="btn btn-outline-success narrow-button" type="submit">Вернуться к складу</button>
+  <button class="btn btn-outline-success narrow-button" type="submit">Вернуться к "Склад"</button>
 </form>
 
 <table id="myTable" class="table table-striped">
@@ -17,7 +17,7 @@
       <th scope="col"></th>
       <th scope="col">Название</th>
       <th scope="col">Количество</th>
-      <th scope="col">Цена 1 шт.</th>
+      <th scope="col">Цена 1 шт (руб)</th>
     </tr>
   </thead>
   <tbody>
@@ -26,7 +26,7 @@
       <th scope="row">{{ loop.index }}</th> <!-- Используем loop.index для нумерации строк -->
       <td>{{ row.name_total }}</td>
       <td>{{ row.quantity_total }}</td>
-      <td>{{ '%.2f' % (row.price_unit_total / 100) }}</td>
+      <td>{{ ('%.2f' % (row.price_unit_total / 100) ) | replace('.', ',') }}</td>
     </tr>
     {% endfor %}
   </tbody>
