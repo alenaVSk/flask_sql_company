@@ -92,11 +92,9 @@ class FDataBase:
         except Exception as e:
             print("Ошибка при сохранении новых данных в БД stock_minus:", str(e))
 
-
     # Метод для добавления данных в log по entry_id
     def save_id_act_to_log(self, id_act, entry_id):
-        print('FD entry_id, id_act', id_act, entry_id)
-        print('FD id_act', id_act)
+
         sql = """
             UPDATE log
             SET id_act = ?
@@ -258,7 +256,7 @@ class FDataBase:
             print("Ошибка при получении записи из БД:", str(e))
         return None
 
-    # Отображение Склада
+        # Отображение Склада
     def getStock(self):
         sql = '''SELECT 
                  sp.name AS name_total,
@@ -286,7 +284,6 @@ class FDataBase:
             print("Ошибка добавления статьи в БД " + str(e))
         return []
 
-
     # Метод для добавления в stock_plus
     def addStock(self, name, quantity, price_unit):
         try:
@@ -301,7 +298,6 @@ class FDataBase:
 
         return True
 
-
     # Список сотрудников
     def getEmployees(self):
         sql = '''SELECT * FROM employees'''
@@ -315,7 +311,6 @@ class FDataBase:
             print("Ошибка чтения из БД")
         return []
 
-
     # Добавление сотрудника
     def addEmployees(self, name, profession):
         try:
@@ -327,7 +322,6 @@ class FDataBase:
 
         return True
 
-
     # Удаление из списка сотрудников
     def delete_entry_employees(self, entry_id):
         sql = '''DELETE FROM employees WHERE id = ?'''
@@ -337,7 +331,6 @@ class FDataBase:
         except Exception as e:
             print("Ошибка удаления из БД:", str(e))
             self.__db.rollback()
-
 
    # Редактирование списка сотрудников
     def get_entry_employees(self, entry_id):
@@ -351,7 +344,6 @@ class FDataBase:
             print("Ошибка при получении записи из БД:", str(e))
         return None
 
-
     # Метод для обновления данных о сотрудниках
     def update_entry_employees(self, entry_id, name, profession):
         try:
@@ -363,4 +355,8 @@ class FDataBase:
         except Exception as e:
             print("Ошибка при обновлении записи в БД:", str(e))
             self.__db.rollback()
+
+
+
+
 

@@ -2,7 +2,7 @@ import sqlite3
 import os
 from flask import Flask, render_template, url_for, request, g, flash, abort, redirect
 from FDataBase import FDataBase
-#from row_data import process_row_data
+
 
 # конфигурация
 DATABASE = '/tmp/fcompany.db'  # путь к БД
@@ -145,12 +145,26 @@ def showList_act():
     return render_template("list_act.html", title="Реестр", list_act=dbase.getList_act())
 
 # Маршрут для отображения финального акта (получение данных из "Реестра" по id)
-@app.route('/final_act/<int:entry_id>', methods=['GET'])
+@app.route('/final_act/<int:entry_id>')
 def showFinal_act(entry_id):
     entry_data = dbase.get_final_act(entry_id)
-    #print(entry_id, entry_data)  # Проверка, получены ли данные
+    if entry_data is None:
+        return "Запись не найдена", 404
+
+    # Убедимся, что все числовые значения являются числами
+    entry_data['main']['total_work'] = int(entry_data['main']['total_work'])
+    entry_data['main']['total_materials'] = int(entry_data['main']['total_materials']) if entry_data['main']['total_materials'] is not None else 0
+    entry_data['main']['total_price'] = int(entry_data['main']['total_price'])
+
+    for work in entry_data['works']:
+        work['price_work'] = int(work['price_work'])
+
+    for material in entry_data['materials']:
+        material['price_unit'] = int(material['price_unit']) if material['price_unit'] is not None else 0
+        material['quantity'] = int(material['quantity']) if material['quantity'] is not None else 0
 
     return render_template('final_act.html', title="Акт выполненных работ", entry_data=entry_data)
+
 
 @app.route("/stock")
 def showStock():

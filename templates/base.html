@@ -12,6 +12,7 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Подключаем файл стилей -->
 
+<!-- Блок для заголовка страницы -->
 {% block title -%}
 {% if title %}
          <title>Drive Avto-{{title}}</title>
@@ -19,10 +20,9 @@
          <title>Drive Avto</title>
 {% endif %}
 {% endblock %}
-
   </head>
 
-  <body>
+<body>
 <header>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
@@ -34,6 +34,7 @@
     <div class="collapse navbar-collapse w-100 justify-content-center" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
+        <!-- Раздел Заказы -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Заказы
@@ -45,6 +46,7 @@
           </ul>
         </li>
 
+        <!-- Раздел Акт выполненных работ -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Акт выполненных работ
@@ -54,6 +56,7 @@
           </ul>
         </li>
 
+        <!-- Раздел Материалы -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Материалы
@@ -65,6 +68,7 @@
           </ul>
         </li>
 
+        <!-- Раздел Сотрудники -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Сотрудники
@@ -76,18 +80,16 @@
           </ul>
         </li>
 
+        <!-- Раздел Разное -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Разное
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="/requisites">Реквизиты</a></li>
-
           </ul>
         </li>
-
       </ul>
-
     </div>
   </div>
 </nav>
@@ -97,9 +99,7 @@
         {% block content %} {% endblock %}
 </div>
 
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
-
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   </body>
 </html>
