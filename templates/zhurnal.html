@@ -3,15 +3,13 @@
 {% block content %}
 
 <h2>Журнал заказов</h2>
-<div style="margin-bottom: 20px;"></div> <!-- Пространство -->
 
 <!-- Форма поиска -->
 <form class="d-flex" role="search">
   <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
-  <button class="btn btn-outline-success narrow-button" type="submit">Вернуться к "Журнал"</button>
+  <button class="btn btn-outline-success narrow-button" type="submit">Вернуться "Журнал"</button>
 </form>
 
-<div style="margin-bottom: 20px;"></div> <!-- Пространство -->
 
 <div class="table-responsive">  <!-- адаптивность для таблицы, не будет выходить за пределы контейнера -->
 <table id="myTable" class="table table-striped max-width: 100%">
@@ -59,15 +57,54 @@
 </table>
 </div>
 
+{% if pagination.total_items > pagination.per_page %}
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    {% if pagination.page > 1 %}
+      <li class="page-item"><a class="page-link" href="{{ url_for('showZhurnal', page=pagination.page-1) }}">&laquo; Назад</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&laquo; Назад</span></li>
+    {% endif %}
 
-<div class="pagination">   <!-- кнопки для пагинации -->
-  <button class="btn btn-outline-primary prev-page"></button>
-  <button class="btn btn-outline-primary next-page"></button>
-</div>
+    {% for page_num in range(1, pagination.total_pages+1) %}
+      {% if page_num == pagination.page %}
+        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+      {% else %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('showZhurnal', page=page_num) }}">{{ page_num }}</a></li>
+      {% endif %}
+    {% endfor %}
 
-<!-- JavaScript-код для обработки поиска -->
+    {% if pagination.page < pagination.total_pages %}
+      <li class="page-item"><a class="page-link" href="{{ url_for('showZhurnal', page=pagination.page+1) }}">Вперед &raquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Вперед &raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+
+<!-- Модальное окно -->
+    <div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="responseModalLabel">Результат операции</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="responseMessage">
+                    <!-- Сообщение будет вставлено сюда через JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    <!-- JavaScript-код для обработки поиска -->
   $(document).ready(function() {
     $("#searchInput").on("keyup", function() {
       var value = $(this).val().toLowerCase();
@@ -76,61 +113,24 @@
       });
     });
   });
-</script>
 
-<!-- JavaScript-код для пагинации -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-  $(document).ready(function() {
-    var currentPage = 1;
-    var rowsPerPage = 10; // Количество строк на одной странице
+<!-- JavaScript-код модальное окно -->
 
-    // Показать нужные строки при загрузке страницы
-    showRows(currentPage, rowsPerPage);
-    updatePagination(); // Обновляем пагинацию при загрузке страницы
+$(document).ready(function() {
+    console.log("Document is ready");
+    // Получаем параметры из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const message = urlParams.get('message');
 
-    // Обработчик нажатия кнопки "Previous"
-    $(".prev-page").click(function() {
-      if (currentPage > 1) {
-        currentPage--;
-        showRows(currentPage, rowsPerPage);
-        updatePagination(); // Обновляем пагинацию при переходе на предыдущую страницу
-      }
-    });
-
-    // Обработчик нажатия кнопки "Next"
-    $(".next-page").click(function() {
-      // Предполагая, что у вас есть функция, которая возвращает общее количество строк в вашей таблице
-      if ((currentPage * rowsPerPage) < getTotalRowsCount()) {
-        currentPage++;
-        showRows(currentPage, rowsPerPage);
-        updatePagination(); // Обновляем пагинацию при переходе на следующую страницу
-      }
-    });
-
-    // Функция для обновления текста кнопок пагинации с номером текущей страницы
-    function updatePagination() {
-      $(".prev-page").text("  " + currentPage);
-      $(".next-page").text("  " + (currentPage + 1));
+    if (status && message) {
+        console.log("Status:", status, "Message:", message);
+        $('#responseMessage').text(message);
+        var responseModal = new bootstrap.Modal(document.getElementById('responseModal'));
+        responseModal.show();
     }
+});
 
-    // Функция для отображения нужных строк таблицы
-    function showRows(pageNumber, rowsPerPage) {
-      var startIndex = (pageNumber - 1) * rowsPerPage;
-      var endIndex = startIndex + rowsPerPage;
-
-      // Скрыть все строки таблицы
-      $("#myTable tbody tr").hide();
-
-      // Показать только нужные строки для текущей страницы
-      $("#myTable tbody tr").slice(startIndex, endIndex).show();
-    }
-
-    // Функция, которая возвращает общее количество строк в вашей таблице
-    function getTotalRowsCount() {
-      return $("#myTable tbody tr").length;
-    }
-  });
 </script>
 
 {% endblock %}

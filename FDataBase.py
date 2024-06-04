@@ -30,7 +30,18 @@ class FDataBase:
 
         return True
 
+    # Метод для проверки существования акта к данному заказу(если да - удаление запрещено)
+    def check_delete_entry(self, entry_id):
+        sql = '''SELECT id_act FROM log WHERE id = ?'''
+        try:
+            self.__cur.execute(sql, (entry_id,))
+            result = self.__cur.fetchone()
+            return result
+        except Exception as e:
+            print("Ошибка проверки записи:", str(e))
+            return None
 
+    # Метод для удаления записи (если не составлен акт)
     def delete_entry(self, entry_id):
         sql = '''DELETE FROM log WHERE id = ?'''
         try:

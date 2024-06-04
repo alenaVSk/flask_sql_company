@@ -2,6 +2,7 @@ import sqlite3
 import os
 from flask import Flask, render_template, url_for, request, g, flash, abort, redirect
 from FDataBase import FDataBase
+from math import ceil
 
 
 # конфигурация
@@ -57,7 +58,21 @@ def index():
 
 @app.route("/zhurnal")
 def showZhurnal():
-    return render_template("zhurnal.html", title="Журнал", log=dbase.getLog())
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  # Количество элементов на странице
+    log_query = dbase.getLog()  # Получаем все элементы склада
+    total_items = len(log_query)  # Получаем общее количество элементов
+    total_pages = ceil(total_items / per_page)  # Вычисляем общее количество страниц
+    start_index = (page - 1) * per_page
+    end_index = start_index + per_page
+    log = log_query[start_index:end_index]  # Получаем элементы текущей страницы
+    pagination = {
+        'page': page,
+        'per_page': per_page,
+        'total_pages': total_pages,
+        'total_items': total_items
+    }
+    return render_template("zhurnal.html", title="Журнал", log=log, pagination=pagination)
 
 
 @app.route("/add_customer", methods=["POST", "GET"])
@@ -78,12 +93,20 @@ def addCustomer():
 @app.route('/delete_entry/<int:entry_id>', methods=['POST'])
 def delete_entry(entry_id):
     try:
-        dbase.delete_entry(entry_id)
-        flash('Запись успешно удалена', 'success')
-    except:
-        flash('Ошибка удаления записи', 'danger')
-    return redirect(url_for('showZhurnal'))
+        result = dbase.check_delete_entry(entry_id)
+        if result and result[0]:
+            message = 'Удаление запрещено, так как есть акт выполненных работ'
+            status = 'error'
+        else:
+            dbase.delete_entry(entry_id)
+            message = 'Запись успешно удалена'
+            status = 'success'
+    except Exception as e:
+        print("Ошибка удаления записи:", str(e))
+        message = 'Ошибка удаления записи'
+        status = 'error'
 
+    return redirect(url_for('showZhurnal', status=status, message=message))
 
 # Маршрут для страницы редактирования записи записи в "Журнал"
 @app.route('/edit_entry/<int:entry_id>', methods=['GET'])
@@ -132,22 +155,41 @@ def save_new_act(entry_id):
     for i in range(len(id_acts)):
         dbase.save_new_act(id_acts[i], date_acts[i], name_works[i], price_works[i])
         dbase.save_new_stock_minus(names[i], price_units[i], quantities[i], id_acts[i])
-        print('fc id_acts[i], entry_id', id_acts[i], entry_id)
-        print('fc id_acts[i]', id_acts[i])
         dbase.save_id_act_to_log(id_acts[i], entry_id)
 
     return redirect(url_for('edit_entry_act', entry_id=entry_id))
-
+'''
 # Маршрут для перехода в реестр актов
 @app.route("/list_act")
 def showList_act():
 
     return render_template("list_act.html", title="Реестр", list_act=dbase.getList_act())
+'''
+@app.route("/list_act")
+def showList_act():
+
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  # Количество элементов на странице
+    list_act_query = dbase.getList_act()  # Получаем все элементы склада
+    total_items = len(list_act_query)  # Получаем общее количество элементов
+    total_pages = ceil(total_items / per_page)  # Вычисляем общее количество страниц
+    start_index = (page - 1) * per_page
+    end_index = start_index + per_page
+    list_act = list_act_query[start_index:end_index]  # Получаем элементы текущей страницы
+    pagination = {
+        'page': page,
+        'per_page': per_page,
+        'total_pages': total_pages,
+        'total_items': total_items
+    }
+    return render_template("list_act.html", title="Реестр", list_act=list_act, pagination=pagination)
+
 
 # Маршрут для отображения финального акта (получение данных из "Реестра" по id)
 @app.route('/final_act/<int:entry_id>')
 def showFinal_act(entry_id):
     entry_data = dbase.get_final_act(entry_id)
+    '''
     if entry_data is None:
         return "Запись не найдена", 404
 
@@ -162,14 +204,29 @@ def showFinal_act(entry_id):
     for material in entry_data['materials']:
         material['price_unit'] = int(material['price_unit']) if material['price_unit'] is not None else 0
         material['quantity'] = int(material['quantity']) if material['quantity'] is not None else 0
+    
+    '''
 
     return render_template('final_act.html', title="Акт выполненных работ", entry_data=entry_data)
 
 
 @app.route("/stock")
 def showStock():
-    return render_template("stock.html", title="Склад материалов", stock=dbase.getStock())
-
+    page = request.args.get('page', 1, type=int)
+    per_page = 3  # Количество элементов на странице
+    stock_query = dbase.getStock()  # Получаем все элементы склада
+    total_items = len(stock_query)  # Получаем общее количество элементов
+    total_pages = ceil(total_items / per_page)  # Вычисляем общее количество страниц
+    start_index = (page - 1) * per_page
+    end_index = start_index + per_page
+    stock = stock_query[start_index:end_index]  # Получаем элементы текущей страницы
+    pagination = {
+        'page': page,
+        'per_page': per_page,
+        'total_pages': total_pages,
+        'total_items': total_items
+    }
+    return render_template("stock.html", title="Склад материалов", stock=stock, pagination=pagination)
 
 @app.route("/add_stock", methods=["POST", "GET"])
 def addStock():
