@@ -60,7 +60,7 @@ def index():
 def showZhurnal():
     page = request.args.get('page', 1, type=int)
     per_page = 10  # Количество элементов на странице
-    log_query = dbase.getLog()  # Получаем все элементы склада
+    log_query = dbase.getLog()  # Получаем все элементы журнала
     total_items = len(log_query)  # Получаем общее количество элементов
     total_pages = ceil(total_items / per_page)  # Вычисляем общее количество страниц
     start_index = (page - 1) * per_page
@@ -95,7 +95,7 @@ def delete_entry(entry_id):
     try:
         result = dbase.check_delete_entry(entry_id)
         if result and result[0]:
-            message = 'Удаление запрещено, так как есть акт выполненных работ'
+            message = 'Удаление запрещено, так как составлен акт выполненных работ'
             status = 'error'
         else:
             dbase.delete_entry(entry_id)
@@ -134,7 +134,6 @@ def save_entry(entry_id):
 @app.route('/edit_entry_act/<int:entry_id>', methods=['GET'])
 def edit_entry_act(entry_id):
     entry_data = dbase.get_entry(entry_id)
-    #print(entry_id, entry_data)  # Проверка, получены ли данные
 
     return render_template('act.html', title="Составить акт выполненных работ", entry_data=entry_data)
 
@@ -142,7 +141,7 @@ def edit_entry_act(entry_id):
 # Маршрут для добавления данных в акт
 @app.route('/edit_entry_act/<int:entry_id>', methods=['POST'])
 def save_new_act(entry_id):
-    # Получить данные из формы
+    print("Получение данных из формы...")
     id_acts = request.form.getlist('id_act[]')
     date_acts = request.form.getlist('date_act[]')
     name_works = request.form.getlist('name_work[]')
@@ -151,26 +150,39 @@ def save_new_act(entry_id):
     price_units = request.form.getlist('price_unit[]')
     quantities = request.form.getlist('quantity[]')
 
-    # проверяем, что длина всех списков одинакова
-    for i in range(len(id_acts)):
-        dbase.save_new_act(id_acts[i], date_acts[i], name_works[i], price_works[i])
-        dbase.save_new_stock_minus(names[i], price_units[i], quantities[i], id_acts[i])
-        dbase.save_id_act_to_log(id_acts[i], entry_id)
+    print(f"Полученные данные: id_acts={id_acts}, date_acts={date_acts}, name_works={name_works}, price_works={price_works}, names={names}, price_units={price_units}, quantities={quantities}")
 
+    for i in range(len(name_works)):
+        id_act = id_acts[0]  # Предполагаем, что id_act и date_act одинаковы для всех строк
+        date_act = date_acts[0]
+        name_work = name_works[i]
+        price_work = price_works[i]
+
+        print(f"Сохранение строки {i + 1} в act...")
+        saved_id_act = dbase.save_new_act(id_act, date_act, name_work, price_work)
+        if saved_id_act is not None:
+            # Поскольку materials тоже имеют несколько строк, используем i для их индексации
+            if i < len(names):
+                name = names[i]
+                price_unit = price_units[i]
+                quantity = quantities[i]
+                print(f"Сохранение строки {i + 1} в stock_minus...")
+                dbase.save_new_stock_minus(name, price_unit, quantity, saved_id_act)
+
+    print(f"Сохранение id_act={id_acts[0]} в log...")
+    dbase.save_id_act_to_log(id_acts[0], entry_id)
+
+    print("Перенаправление на страницу edit_entry_act...")
     return redirect(url_for('edit_entry_act', entry_id=entry_id))
-'''
-# Маршрут для перехода в реестр актов
-@app.route("/list_act")
-def showList_act():
 
-    return render_template("list_act.html", title="Реестр", list_act=dbase.getList_act())
-'''
+
+# Маршрут для перехода в реестр актов
 @app.route("/list_act")
 def showList_act():
 
     page = request.args.get('page', 1, type=int)
     per_page = 10  # Количество элементов на странице
-    list_act_query = dbase.getList_act()  # Получаем все элементы склада
+    list_act_query = dbase.getList_act()  # Получаем все элементы реестра
     total_items = len(list_act_query)  # Получаем общее количество элементов
     total_pages = ceil(total_items / per_page)  # Вычисляем общее количество страниц
     start_index = (page - 1) * per_page
@@ -189,26 +201,75 @@ def showList_act():
 @app.route('/final_act/<int:entry_id>')
 def showFinal_act(entry_id):
     entry_data = dbase.get_final_act(entry_id)
-    '''
-    if entry_data is None:
-        return "Запись не найдена", 404
-
-    # Убедимся, что все числовые значения являются числами
-    entry_data['main']['total_work'] = int(entry_data['main']['total_work'])
-    entry_data['main']['total_materials'] = int(entry_data['main']['total_materials']) if entry_data['main']['total_materials'] is not None else 0
-    entry_data['main']['total_price'] = int(entry_data['main']['total_price'])
-
-    for work in entry_data['works']:
-        work['price_work'] = int(work['price_work'])
-
-    for material in entry_data['materials']:
-        material['price_unit'] = int(material['price_unit']) if material['price_unit'] is not None else 0
-        material['quantity'] = int(material['quantity']) if material['quantity'] is not None else 0
-    
-    '''
 
     return render_template('final_act.html', title="Акт выполненных работ", entry_data=entry_data)
 
+'''
+# Маршрут для редактирования финального акта  ???????
+@app.route('/edit_final_act/<int:act_id>', methods=['GET', 'POST'])
+def edit_act(act_id):
+    if request.method == 'POST':
+        print("Получение данных из формы...")
+        id_act = request.form['id_act']
+        date_act = request.form['date_act']
+        name_works = request.form.getlist('name_work[]')
+        price_works = request.form.getlist('price_work[]')
+        names = request.form.getlist('name[]')
+        price_units = request.form.getlist('price_unit[]')
+        quantities = request.form.getlist('quantity[]')
+
+        print(f"Полученные данные: id_act={id_act}, date_act={date_act}, name_works={name_works}, price_works={price_works}, names={names}, price_units={price_units}, quantities={quantities}")
+
+        # Обновление данных в таблице act
+        dbase.update_act(act_id, id_act, date_act)
+
+        # Удаление старых записей из таблицы stock_minus, связанных с данным актом
+        dbase.delete_stock_minus_by_act(act_id)
+
+        for i in range(len(name_works)):
+            name_work = name_works[i]
+            price_work = price_works[i]
+
+            print(f"Сохранение строки {i + 1} в act...")
+            dbase.save_act_work(act_id, name_work, price_work)
+
+            if i < len(names):
+                name = names[i]
+                price_unit = price_units[i]
+                quantity = quantities[i]
+                print(f"Сохранение строки {i + 1} в stock_minus...")
+                dbase.save_new_stock_minus(name, price_unit, quantity, act_id)
+
+        print("Перенаправление на страницу просмотра акта...")
+        return redirect(url_for('view_act', act_id=act_id))
+    else:
+        # Получение данных акта из базы данных
+        act = dbase.get_act_by_id(act_id)
+        act_works = dbase.get_act_works(act_id)
+        stock_minus = dbase.get_stock_minus_by_act(act_id)
+
+        return render_template('edit_act.html', act=act, act_works=act_works, stock_minus=stock_minus)
+
+
+# Маршрут для сохранения изменений в финальном акте ??????
+@app.route('/save_edit_final_act/<int:entry_id>/<date_act>', methods=['POST'])
+def save_edit_final_act(entry_id, date_act):
+    # Получить данные из формы
+    name_works = request.form.getlist('name_work[]')
+    price_works = request.form.getlist('price_work[]')
+
+    names = request.form.getlist('name[]')
+    price_units = request.form.getlist('price_unit[]')
+    quantities = request.form.getlist('quantity[]')
+
+    # Получить значение date_act из entry_data.main.date_act
+    #date_act = entry_data.main.date_act
+    print('entry_id, date_act', entry_id, date_act)
+    print('name_works', name_works)
+    print('names', names)
+    dbase.update_final_act(entry_id, date_act, name_works, price_works, names, price_units, quantities)
+    return redirect(url_for('showFinal_act', entry_id=entry_id))
+'''
 
 @app.route("/stock")
 def showStock():

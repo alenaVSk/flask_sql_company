@@ -77,7 +77,6 @@ class FDataBase:
             print("Ошибка при обновлении записи в БД:", str(e))
             self.__db.rollback()
 
-
     # Метод для добавления данных в act
     def save_new_act(self, id_act, date_act, name_work, price_work):
         sql = """
@@ -85,11 +84,15 @@ class FDataBase:
             VALUES (?, ?, ?, ?)
         """
         try:
+            print(
+                f"Сохранение в act: id_act={id_act}, date_act={date_act}, name_work={name_work}, price_work={price_work}")
             self.__cur.execute(sql, (id_act, date_act, name_work, price_work))
             self.__db.commit()
+            print(f"Данные успешно сохранены в act")
+            return id_act
         except Exception as e:
-            print("Ошибка при сохранении новых данных в БД act:", str(e))
-
+            print(f"Ошибка при сохранении новых данных в БД act: {str(e)}")
+            return None
 
     # Метод для добавления данных в stock_minus
     def save_new_stock_minus(self, name, price_unit, quantity, id_act):
@@ -98,8 +101,11 @@ class FDataBase:
             VALUES (?, ?, ?, ?)
         """
         try:
+            print(
+                f"Сохранение в stock_minus: name={name}, price_unit={price_unit}, quantity={quantity}, id_act={id_act}")
             self.__cur.execute(sql, (name, price_unit, quantity, id_act))
             self.__db.commit()
+            print("Данные успешно сохранены в stock_minus")
         except Exception as e:
             print("Ошибка при сохранении новых данных в БД stock_minus:", str(e))
 
@@ -266,6 +272,36 @@ class FDataBase:
         except Exception as e:
             print("Ошибка при получении записи из БД:", str(e))
         return None
+
+
+
+        # Метод для обновления данных в final act  ??????????????????
+
+    def update_final_act(self, entry_id, date_act, name_works, price_works, names, price_units, quantities):
+        try:
+            self.__cur.execute("""
+                UPDATE act SET name_work = ?, price_work = ?, date_act = ? WHERE id_act = ?;
+            """, (name_works, price_works, date_act, entry_id))
+            self.__db.commit()
+
+            # Удаление старых записей из таблицы stock_minus для данного акта
+            self.__cur.execute("""
+                DELETE FROM stock_minus WHERE id_act = ?;
+            """, (entry_id,))
+
+            # Вставка новых записей в таблицу stock_minus
+            for name, price_unit, quantity in zip(names, price_units, quantities):
+                self.__cur.execute('''
+                    INSERT INTO stock_minus (id_act, name, price_unit, quantity) VALUES (?, ?, ?, ?);
+                ''', (entry_id, name, price_unit, quantity))
+            self.__db.commit()
+
+        except Exception as e:
+            print("Ошибка обновления данных в БД:", str(e))
+            self.__db.rollback()
+
+
+
 
         # Отображение Склада
     def getStock(self):

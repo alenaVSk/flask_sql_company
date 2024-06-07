@@ -2,12 +2,14 @@
 
 {% block content %}
 
-<h2>Составить акт выполненных работ</h2>
+<h2>Редактирование акта выполненных работ № {{ entry_data.main.id_act }}<span style="font-family: 'Arial', sans-serif; font-size: 27px;">
+    от {{ entry_data.main.date_act }}</span></h2>
+
 <div style="margin-bottom: 20px;"></div>
 <!-- Пространство -->
 <div class="table-responsive">
     <!-- адаптивность для таблицы, не будет выходить за пределы контейнера -->
-    <form id="actForm" action="/edit_entry_act/{{ entry_data.id }}" method="post" class="form-contact" onsubmit="return validateForm()">
+    <form id="actForm" action="/update_act/{{ act_data.id_act }}" method="post" class="form-contact" onsubmit="return validateForm()">
         <table id="myTable" class="table table-striped max-width: 100%">
             <thead>
                 <tr>
@@ -31,67 +33,80 @@
             </tbody>
         </table>
 
-
-<h3>Добавить новые данные</h3>
+        <h3>Редактировать данные акта</h3>
 
         <table id="actTable" class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Номер акта</th>
-                <th scope="col">Дата акта</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="number" name="id_act[]" class="form-control" style="width: 100px;" ></td>
-                <td><input type="text" name="date_act[]" class="form-control"></td>
-            </tr>
-        </tbody>
-    </table>
+            <thead>
+                <tr>
+                    <th scope="col">Номер акта</th>
+                    <th scope="col">Дата акта</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="number" name="id_act" class="form-control" style="width: 100px;" value="{{ act_data.id_act }}"></td>
+                    <td><input type="text" name="date_act" class="form-control" value="{{ act_data.date_act }}"></td>
+                </tr>
+            </tbody>
+        </table>
 
-    <table id="workTable" class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">Наименование работ</th>
-            <th scope="col">Стоимость работ(без запятой)</th>
-            <th scope="col"></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><input type="text" name="name_work[]" class="form-control" style="width: 300px;"></td>
-            <td><input type="number" name="price_work[]" class="form-control"></td>
-            <td><button type="button" class="btn btn-outline-primary" onclick="addWorkRow()">+</button></td>
-        </tr>
-    </tbody>
-</table>
+        <table id="workTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Наименование работ</th>
+                    <th scope="col">Стоимость работ(без запятой)</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work in act_data.works %}
+                <tr>
+                    <td><input type="text" name="name_work[]" class="form-control" style="width: 300px;" value="{{ work.name_work }}"></td>
+                    <td><input type="number" name="price_work[]" class="form-control" value="{{ work.price_work }}"></td>
+                    <td><button type="button" class="btn btn-outline-danger" onclick="removeWorkRow(this)">-</button></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td><input type="text" name="name_work[]" class="form-control" style="width: 300px;"></td>
+                    <td><input type="number" name="price_work[]" class="form-control"></td>
+                    <td><button type="button" class="btn btn-outline-primary" onclick="addWorkRow()">+</button></td>
+                </tr>
+            </tbody>
+        </table>
 
-<table id="materialTable" class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col">Наименование материалов</th>
-            <th scope="col">Цена за ед.(без запятой)</th>
-            <th scope="col">Количество</th>
-            <th scope="col"></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><input type="text" name="name[]" class="form-control" style="width: 300px;"></td>
-            <td><input type="number" name="price_unit[]" class="form-control"></td>
-            <td><input type="number" name="quantity[]" class="form-control" style="width: 100px;"></td>
-            <td><button type="button" class="btn btn-outline-primary" onclick="addMaterialRow()">+</button></td>
-        </tr>
-    </tbody>
-</table>
+        <table id="materialTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Наименование материалов</th>
+                    <th scope="col">Цена за ед.(без запятой)</th>
+                    <th scope="col">Количество</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in act_data.materials %}
+                <tr>
+                    <td><input type="text" name="name[]" class="form-control" style="width: 300px;" value="{{ material.name }}"></td>
+                    <td><input type="number" name="price_unit[]" class="form-control" value="{{ material.price_unit }}"></td>
+                    <td><input type="number" name="quantity[]" class="form-control" style="width: 100px;" value="{{ material.quantity }}"></td>
+                    <td><button type="button" class="btn btn-outline-danger" onclick="removeMaterialRow(this)">-</button></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td><input type="text" name="name[]" class="form-control" style="width: 300px;"></td>
+                    <td><input type="number" name="price_unit[]" class="form-control"></td>
+                    <td><input type="number" name="quantity[]" class="form-control" style="width: 100px;"></td>
+                    <td><button type="button" class="btn btn-outline-primary" onclick="addMaterialRow()">+</button></td>
+                </tr>
+            </tbody>
+        </table>
 
-    <div class="container">
-            <button type="button" class="btn btn-outline-primary" onclick="addRow()">Добавить строку</button>
-            <button type="submit" class="btn btn-outline-primary">Сохранить</button>
+        <div class="container">
+            <button type="submit" class="btn btn-outline-primary">Сохранить изменения</button>
             <button type="button" class="btn btn-outline-success return-button" onclick="window.location.href = '/zhurnal'">Вернуться "Журнал"</button>
-    </div>
+        </div>
 
-</form>
+    </form>
 </div>
 
 <!-- Modal -->
@@ -113,30 +128,9 @@
 </div>
 
 <script>
-
-function addRow() {
-    var actTable = document.getElementById("actTable").getElementsByTagName('tbody')[0];
-
-    var actRow = actTable.insertRow();
-
-    var actColumns = [
-        { name: 'id_act[]', type: 'number' },
-        { name: 'date_act[]', type: 'text' }
-    ];
-
-    for (var i = 0; i < actColumns.length; i++) {
-        var newCell = actRow.insertCell(i);
-        var input = document.createElement("input");
-        input.type = actColumns[i].type;
-        input.name = actColumns[i].name;
-        input.className = "form-control";
-        newCell.appendChild(input);
-    }
-}
-
 function addWorkRow() {
     var workTable = document.getElementById("workTable").getElementsByTagName('tbody')[0];
-    var workRow = workTable.insertRow();
+    var workRow = workTable.insertRow(workTable.rows.length - 1);
 
     var workColumns = [
         { name: 'name_work[]', type: 'text' },
@@ -158,14 +152,19 @@ function addWorkRow() {
     deleteButton.className = "btn btn-outline-danger";
     deleteButton.textContent = "-";
     deleteButton.onclick = function() {
-        workTable.deleteRow(workRow.rowIndex);
+        removeWorkRow(this);
     };
     buttonCell.appendChild(deleteButton);
 }
 
+function removeWorkRow(button) {
+    var workRow = button.parentNode.parentNode;
+    workRow.parentNode.removeChild(workRow);
+}
+
 function addMaterialRow() {
     var materialTable = document.getElementById("materialTable").getElementsByTagName('tbody')[0];
-    var materialRow = materialTable.insertRow();
+    var materialRow = materialTable.insertRow(materialTable.rows.length - 1);
 
     var materialColumns = [
         { name: 'name[]', type: 'text' },
@@ -188,9 +187,14 @@ function addMaterialRow() {
     deleteButton.className = "btn btn-outline-danger";
     deleteButton.textContent = "-";
     deleteButton.onclick = function() {
-        materialTable.deleteRow(materialRow.rowIndex);
+        removeMaterialRow(this);
     };
     buttonCell.appendChild(deleteButton);
+}
+
+function removeMaterialRow(button) {
+    var materialRow = button.parentNode.parentNode;
+    materialRow.parentNode.removeChild(materialRow);
 }
 
 function validateForm() {

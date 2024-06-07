@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Редактирование акта выполненных работ № {{ entry_data.main.id_act }}<span style="font-family: 'Arial', sans-serif; font-size: 27px;">
+    от {{ entry_data.main.date_act }}</span></h2>
+
+<div style="margin-bottom: 20px;"></div>
+
+
+<form method="post" action="{{ url_for('save_edit_final_act', entry_id=entry_data.main.id_act, date_act=entry_data.main.date_act) }}">
+    <div class="table-responsive">
+        <table id="myTable" class="table table-striped" style="max-width: 100%;">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">ФИО клиента</th>
+                    <th scope="col">Марка авто</th>
+                    <th scope="col">Год выпуска</th>
+                    <th scope="col">Номер авто</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row"></th>
+                    <td>{{ entry_data.main.name_customer }}</td>
+                    <td>{{ entry_data.main.brand_car }}</td>
+                    <td>{{ entry_data.main.year_car }}</td>
+                    <td>{{ entry_data.main.number_car }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h4>Выполненные работы:</h4>
+
+    <div class="table-responsive">
+        <table id="workTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Наименование работ</th>
+                    <th scope="col">Стоимость работ (руб)</th>
+                    <th scope="col">Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work in entry_data.works %}
+                <tr>
+                    <td><input type="text" name="name_work[]" class="form-control" value="{{ work.name_work }}"></td>
+                    <td><input type="number" name="price_work[]" class="form-control" value="{{ ('%.2f' % (work.price_work / 100) ) | replace('.', ',') }}"></td>
+                    <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Удалить</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-primary" onclick="addWorkRow()">Добавить работу</button>
+    </div>
+
+    <h4>Использованные материалы:</h4>
+
+    <div class="table-responsive">
+        <table id="materialTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Наименование материалов</th>
+                    <th scope="col">Цена за ед (руб)</th>
+                    <th scope="col">Количество</th>
+                    <th scope="col">Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in entry_data.materials %}
+                <tr>
+                    <td><input type="text" name="name_material[]" class="form-control" value="{{ material.name }}"></td>
+                    <td><input type="number" name="price_unit[]" class="form-control" value="{{ ('%.2f' % (material.price_unit / 100) ) | replace('.', ',') }}"></td>
+                    <td><input type="number" name="quantity[]" class="form-control" value="{{ material.quantity }}"></td>
+                    <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Удалить</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-primary" onclick="addMaterialRow()">Добавить материал</button>
+    </div>
+
+    <div class="container">
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        <button type="button" class="btn btn-outline-success return-button" onclick="window.location.href = '/list_act'">Вернуться "Реестр"</button>
+    </div>
+</form>
+
+<script>
+    function addWorkRow() {
+        const table = document.getElementById('workTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+        newRow.innerHTML = `
+            <td><input type="text" name="name_work[]" class="form-control" value=""></td>
+            <td><input type="number" name="price_work[]" class="form-control" value=""></td>
+            <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Удалить</button></td>
+        `;
+    }
+
+    function addMaterialRow() {
+        const table = document.getElementById('materialTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+        newRow.innerHTML = `
+            <td><input type="text" name="name_material[]" class="form-control" value=""></td>
+            <td><input type="number" name="price_unit[]" class="form-control" value=""></td>
+            <td><input type="number" name="quantity[]" class="form-control" value=""></td>
+            <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Удалить</button></td>
+        `;
+    }
+
+    function removeRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+</script>
+
+{% endblock %}
+
