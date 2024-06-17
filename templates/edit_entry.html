@@ -6,6 +6,7 @@
 <div style="margin-bottom: 20px;"></div>
 
 <form action="/save_entry/{{ entry_data.id }}" method="post" class="form-contact">
+    <p>ID акта: {{ entry_data.id }}</p>
     <label for="date_order">Дата заказа:</label>
     <input type="text" id="date_order" name="date_order" value="{{ entry_data.date_order }}" class="form-contact" required ><br><br>
     <label for="name_customer">ФИО клиента:</label>

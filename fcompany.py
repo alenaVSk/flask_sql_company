@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from flask import Flask, render_template, url_for, request, g, flash, abort, redirect
+from flask import Flask, render_template, url_for, request, g, flash, redirect
 from FDataBase import FDataBase
 from math import ceil
 
@@ -112,7 +112,7 @@ def delete_entry(entry_id):
 @app.route('/edit_entry/<int:entry_id>', methods=['GET'])
 def edit_entry(entry_id):
     entry_data = dbase.get_entry(entry_id)
-    # print(entry_data)  # Проверка, получены ли данные
+    print('entry_data', entry_data)  # Проверка, получены ли данные
     return render_template('edit_entry.html', title="Редактировать", entry_data=entry_data)
 
 
@@ -139,7 +139,7 @@ def edit_entry_act(entry_id):
 
 
 # Маршрут для добавления данных в акт
-@app.route('/edit_entry_act/<int:entry_id>', methods=['POST'])
+@app.route('/save_new_act/<int:entry_id>', methods=['POST'])
 def save_new_act(entry_id):
     print("Получение данных из формы...")
     id_acts = request.form.getlist('id_act[]')
@@ -173,7 +173,7 @@ def save_new_act(entry_id):
     dbase.save_id_act_to_log(id_acts[0], entry_id)
 
     print("Перенаправление на страницу edit_entry_act...")
-    return redirect(url_for('edit_entry_act', entry_id=entry_id))
+    return redirect(url_for('edit_entry_act', entry_id=entry_id))  # перенаправить на финальный акт !!!!!!
 
 
 # Маршрут для перехода в реестр актов
@@ -200,76 +200,45 @@ def showList_act():
 # Маршрут для отображения финального акта (получение данных из "Реестра" по id)
 @app.route('/final_act/<int:entry_id>')
 def showFinal_act(entry_id):
+    print('entry_id: ', entry_id)
     entry_data = dbase.get_final_act(entry_id)
 
     return render_template('final_act.html', title="Акт выполненных работ", entry_data=entry_data)
 
-'''
-# Маршрут для редактирования финального акта  ???????
-@app.route('/edit_final_act/<int:act_id>', methods=['GET', 'POST'])
-def edit_act(act_id):
-    if request.method == 'POST':
-        print("Получение данных из формы...")
-        id_act = request.form['id_act']
-        date_act = request.form['date_act']
-        name_works = request.form.getlist('name_work[]')
-        price_works = request.form.getlist('price_work[]')
-        names = request.form.getlist('name[]')
-        price_units = request.form.getlist('price_unit[]')
-        quantities = request.form.getlist('quantity[]')
 
-        print(f"Полученные данные: id_act={id_act}, date_act={date_act}, name_works={name_works}, price_works={price_works}, names={names}, price_units={price_units}, quantities={quantities}")
-
-        # Обновление данных в таблице act
-        dbase.update_act(act_id, id_act, date_act)
-
-        # Удаление старых записей из таблицы stock_minus, связанных с данным актом
-        dbase.delete_stock_minus_by_act(act_id)
-
-        for i in range(len(name_works)):
-            name_work = name_works[i]
-            price_work = price_works[i]
-
-            print(f"Сохранение строки {i + 1} в act...")
-            dbase.save_act_work(act_id, name_work, price_work)
-
-            if i < len(names):
-                name = names[i]
-                price_unit = price_units[i]
-                quantity = quantities[i]
-                print(f"Сохранение строки {i + 1} в stock_minus...")
-                dbase.save_new_stock_minus(name, price_unit, quantity, act_id)
-
-        print("Перенаправление на страницу просмотра акта...")
-        return redirect(url_for('view_act', act_id=act_id))
-    else:
-        # Получение данных акта из базы данных
-        act = dbase.get_act_by_id(act_id)
-        act_works = dbase.get_act_works(act_id)
-        stock_minus = dbase.get_stock_minus_by_act(act_id)
-
-        return render_template('edit_act.html', act=act, act_works=act_works, stock_minus=stock_minus)
+# Маршрут для редактирования финального акта
+@app.route('/edit_final_act/<int:entry_id>')
+def edit_final_act(entry_id):
+    entry_data = dbase.get_final_act(entry_id)
+    print(f"Entry data: {entry_data}")
+    print('edit_final_ac - entry_id: ', entry_id)
+    return render_template('edit_final_act.html', title="Редактировать", entry_data=entry_data)
 
 
-# Маршрут для сохранения изменений в финальном акте ??????
-@app.route('/save_edit_final_act/<int:entry_id>/<date_act>', methods=['POST'])
-def save_edit_final_act(entry_id, date_act):
-    # Получить данные из формы
+# Маршрут для сохранения изменённых и/или добавленных данных в финальном акте
+@app.route('/save_edit_final_act/<int:entry_id>', methods=['POST'])
+def save_edit_final_act(entry_id):
+
     name_works = request.form.getlist('name_work[]')
     price_works = request.form.getlist('price_work[]')
-
     names = request.form.getlist('name[]')
     price_units = request.form.getlist('price_unit[]')
     quantities = request.form.getlist('quantity[]')
+    date_act = request.form.get('date_act')  # Добавляем получение даты акта из формы
+    print(
+        f"Полученные данные: date_act={date_act}, name_works={name_works}, price_works={price_works}, names={names}, price_units={price_units}, quantities={quantities}")
 
-    # Получить значение date_act из entry_data.main.date_act
-    #date_act = entry_data.main.date_act
-    print('entry_id, date_act', entry_id, date_act)
-    print('name_works', name_works)
-    print('names', names)
-    dbase.update_final_act(entry_id, date_act, name_works, price_works, names, price_units, quantities)
+    new_act_values = [(name_work, price_work) for name_work, price_work in zip(name_works, price_works)]
+    new_stock_minus_values = [(name, price_unit, quantity) for name, price_unit, quantity in
+                              zip(names, price_units, quantities)]
+
+    print(f"new_act_values: {new_act_values}")
+    print(f"new_stock_minus_values: {new_stock_minus_values}")
+
+    dbase.update_act_and_stock_minus(entry_id, date_act, new_act_values, new_stock_minus_values)
+
     return redirect(url_for('showFinal_act', entry_id=entry_id))
-'''
+
 
 @app.route("/stock")
 def showStock():
@@ -288,6 +257,7 @@ def showStock():
         'total_items': total_items
     }
     return render_template("stock.html", title="Склад материалов", stock=stock, pagination=pagination)
+
 
 @app.route("/add_stock", methods=["POST", "GET"])
 def addStock():

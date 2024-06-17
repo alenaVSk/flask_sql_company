@@ -1,40 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/home/elena/PycharmProjects/flask_sql_company/fcompany.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1461"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,3:mainact"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="act" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="28"/><column index="2" value="47"/><column index="3" value="67"/><column index="4" value="95"/><column index="5" value="84"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="stock_minus" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="28"/><column index="2" value="131"/><column index="3" value="67"/><column index="4" value="77"/><column index="5" value="47"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">SELECT 
-    log.id_act,
-    act.date_act,
-    log.name_customer,
-    log.brand_car,
-    log.year_car,
-    log.number_car,
-    SUM(act.price_work) AS total_work,
-    (
-        SELECT 
-            SUM(stock_minus.price_unit * stock_minus.quantity)
-        FROM 
-            stock_minus
-        WHERE 
-            stock_minus.id_act = log.id_act
-    ) AS total_materials,
-    (
-        SUM(act.price_work) +
-        (
-            SELECT 
-                SUM(stock_minus.price_unit * stock_minus.quantity)
-            FROM 
-                stock_minus
-            WHERE 
-                stock_minus.id_act = log.id_act
-        )
-    ) AS total_price
-FROM 
-    log
-JOIN 
-    act ON log.id_act = act.id_act
-GROUP BY 
-    log.id_act,
-    act.date_act,
-    log.name_customer,
-    log.brand_car,
-    log.year_car,
-    log.number_car;
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/home/elena/PycharmProjects/flask_sql_company/fcompany.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="1"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1461"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,3:mainact"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="act" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="28"/><column index="2" value="47"/><column index="3" value="67"/><column index="4" value="144"/><column index="5" value="84"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="stock_minus" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="28"/><column index="2" value="131"/><column index="3" value="67"/><column index="4" value="77"/><column index="5" value="47"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">
+
+UPDATE stock_minus SET name = 'антифриз', quantity = 1, price_unit = 250 
+WHERE id_act = 3;
 
 </sql><current_tab id="0"/></tab_sql></sqlb_project>

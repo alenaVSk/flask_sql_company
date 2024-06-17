@@ -77,6 +77,7 @@ class FDataBase:
             print("Ошибка при обновлении записи в БД:", str(e))
             self.__db.rollback()
 
+
     # Метод для добавления данных в act
     def save_new_act(self, id_act, date_act, name_work, price_work):
         sql = """
@@ -274,36 +275,58 @@ class FDataBase:
         return None
 
 
+        # Метод для обновления (добавления/удаления) данных в final act
+    def delete_act_rows(self, entry_id):
+        sql = "DELETE FROM act WHERE id_act = ?"
+        self.__cur.execute(sql, (entry_id,))
+        print(f"Удалены записи из act для id_act={entry_id}")
 
-        # Метод для обновления данных в final act  ??????????????????
+    def delete_stock_minus_rows(self, entry_id):
+        sql = "DELETE FROM stock_minus WHERE id_act = ?"
+        self.__cur.execute(sql, (entry_id,))
+        print(f"Удалены записи из stock_minus для id_act={entry_id}")
 
-    def update_final_act(self, entry_id, date_act, name_works, price_works, names, price_units, quantities):
+    def insert_act_row(self, entry_id, date_act, name_work, price_work):
+        sql = """
+            INSERT INTO act (id_act, date_act, name_work, price_work)
+            VALUES (?, ?, ?, ?)
+        """
+        self.__cur.execute(sql, (entry_id, date_act, name_work, price_work))
+        print(f"Новая запись успешно добавлена в act для id_act={entry_id}")
+
+    def insert_stock_minus_row(self, entry_id, name, price_unit, quantity):
+        sql = """
+            INSERT INTO stock_minus (id_act, name, price_unit, quantity)
+            VALUES (?, ?, ?, ?)
+        """
+        self.__cur.execute(sql, (entry_id, name, price_unit, quantity))
+        print(f"Новая запись успешно добавлена в stock_minus для id_act={entry_id}")
+
+    def update_act_and_stock_minus(self, entry_id, date_act, new_act_values, new_stock_minus_values):
         try:
-            self.__cur.execute("""
-                UPDATE act SET name_work = ?, price_work = ?, date_act = ? WHERE id_act = ?;
-            """, (name_works, price_works, date_act, entry_id))
+            self.__db.execute('BEGIN TRANSACTION')
+
+            # Удаление строк
+            self.delete_act_rows(entry_id)
+            self.delete_stock_minus_rows(entry_id)
+
+            # Вставка новых значений в act
+            for name_work, price_work in new_act_values:
+                self.insert_act_row(entry_id, date_act, name_work, price_work)
+
+            # Вставка новых значений в stock_minus
+            for name, price_unit, quantity in new_stock_minus_values:
+                self.insert_stock_minus_row(entry_id, name, price_unit, quantity)
+
             self.__db.commit()
-
-            # Удаление старых записей из таблицы stock_minus для данного акта
-            self.__cur.execute("""
-                DELETE FROM stock_minus WHERE id_act = ?;
-            """, (entry_id,))
-
-            # Вставка новых записей в таблицу stock_minus
-            for name, price_unit, quantity in zip(names, price_units, quantities):
-                self.__cur.execute('''
-                    INSERT INTO stock_minus (id_act, name, price_unit, quantity) VALUES (?, ?, ?, ?);
-                ''', (entry_id, name, price_unit, quantity))
-            self.__db.commit()
-
         except Exception as e:
-            print("Ошибка обновления данных в БД:", str(e))
             self.__db.rollback()
+            print(f"An error occurred while inserting into stock_minus: {e}")
+        finally:
+            self.__cur.close()
+            self.__db.close()
 
-
-
-
-        # Отображение Склада
+    # Отображение Склада
     def getStock(self):
         sql = '''SELECT 
                  sp.name AS name_total,
@@ -391,6 +414,7 @@ class FDataBase:
             print("Ошибка при получении записи из БД:", str(e))
         return None
 
+
     # Метод для обновления данных о сотрудниках
     def update_entry_employees(self, entry_id, name, profession):
         try:
@@ -402,6 +426,10 @@ class FDataBase:
         except Exception as e:
             print("Ошибка при обновлении записи в БД:", str(e))
             self.__db.rollback()
+
+
+
+
 
 
 

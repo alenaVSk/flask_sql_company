@@ -8,7 +8,10 @@
 <div style="margin-bottom: 20px;"></div>
 
 
-<form method="post" action="{{ url_for('save_edit_final_act', entry_id=entry_data.main.id_act, date_act=entry_data.main.date_act) }}">
+<form action="/save_edit_final_act/{{ entry_data.main.id_act }}" method="post">
+    <input type="hidden" name="entry_id" value="{{ entry_data.main.id_act }}">
+    <input type="hidden" name="date_act" value="{{ entry_data.main.date_act }}">
+    <p>ID акта: {{ entry_data.main.id_act }}</p>
     <div class="table-responsive">
         <table id="myTable" class="table table-striped" style="max-width: 100%;">
             <thead>
@@ -34,27 +37,31 @@
 
     <h4>Выполненные работы:</h4>
 
+
     <div class="table-responsive">
         <table id="workTable" class="table table-striped">
             <thead>
                 <tr>
                     <th scope="col">Наименование работ</th>
                     <th scope="col">Стоимость работ (руб)</th>
-                    <th scope="col">Удалить</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for work in entry_data.works %}
                 <tr>
-                    <td><input type="text" name="name_work[]" class="form-control" value="{{ work.name_work }}"></td>
-                    <td><input type="number" name="price_work[]" class="form-control" value="{{ ('%.2f' % (work.price_work / 100) ) | replace('.', ',') }}"></td>
-                    <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Удалить</button></td>
+                    <td><input type="text" name="name_work[]" class="form-control" value="{{ work.name_work }}" ></td>
+                    <td><input type="number" name="price_work[]" class="form-control" value="{{ work.price_work }}"></td>
+                    <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteWorkRow(this)">Удалить</button></td>
                 </tr>
                 {% endfor %}
+
             </tbody>
         </table>
-        <button type="button" class="btn btn-primary" onclick="addWorkRow()">Добавить работу</button>
+
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addWorkRow()">Добавить строку</button>
     </div>
+
 
     <h4>Использованные материалы:</h4>
 
@@ -65,56 +72,104 @@
                     <th scope="col">Наименование материалов</th>
                     <th scope="col">Цена за ед (руб)</th>
                     <th scope="col">Количество</th>
-                    <th scope="col">Удалить</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for material in entry_data.materials %}
                 <tr>
-                    <td><input type="text" name="name_material[]" class="form-control" value="{{ material.name }}"></td>
-                    <td><input type="number" name="price_unit[]" class="form-control" value="{{ ('%.2f' % (material.price_unit / 100) ) | replace('.', ',') }}"></td>
+                    <td><input type="text" name="name[]" class="form-control" value="{{ material.name }}"></td>
+                    <td><input type="number" name="price_unit[]" class="form-control" value="{{ material.price_unit }}"></td>
                     <td><input type="number" name="quantity[]" class="form-control" value="{{ material.quantity }}"></td>
-                    <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Удалить</button></td>
+                    <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteRow(this)">Удалить</button></td>
                 </tr>
                 {% endfor %}
+
             </tbody>
         </table>
-        <button type="button" class="btn btn-primary" onclick="addMaterialRow()">Добавить материал</button>
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addMaterialRow()">Добавить строку</button>
     </div>
 
     <div class="container">
-        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-        <button type="button" class="btn btn-outline-success return-button" onclick="window.location.href = '/list_act'">Вернуться "Реестр"</button>
+        <button type="submit" class="btn btn-outline-primary">Сохранить все изменения</button>
+        <button type="button" class="btn btn-outline-success return-button" onclick="window.location.href = '/showFinal_act'">Вернуться "Акт выполненных работ"</button>
     </div>
 </form>
 
 <script>
+     // "Добавить строку" и "Удалить" в "работа"
     function addWorkRow() {
-        const table = document.getElementById('workTable').getElementsByTagName('tbody')[0];
-        const newRow = table.insertRow();
-        newRow.innerHTML = `
-            <td><input type="text" name="name_work[]" class="form-control" value=""></td>
-            <td><input type="number" name="price_work[]" class="form-control" value=""></td>
-            <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Удалить</button></td>
-        `;
+    var workTable = document.getElementById("workTable").getElementsByTagName('tbody')[0];
+    var workRow = workTable.insertRow();
+
+    var workColumns = [
+        { name: 'name_work[]', type: 'text' },
+        { name: 'price_work[]', type: 'number' }
+    ];
+
+    for (var i = 0; i < workColumns.length; i++) {
+        var newCell = workRow.insertCell(i);
+        var input = document.createElement("input");
+        input.type = workColumns[i].type;
+        input.name = workColumns[i].name;
+        input.className = "form-control";
+        newCell.appendChild(input);
     }
 
+    var buttonCell = workRow.insertCell(workColumns.length);
+    var deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "btn btn-outline-danger btn-sm";
+    deleteButton.textContent = "Удалить";
+    deleteButton.onclick = function() {
+        deleteWorkRow(workRow); // Передаем workRow в функцию deleteWorkRow
+    };
+    buttonCell.appendChild(deleteButton);
+}
+
+    // Функция для удаления строки
+    function deleteWorkRow(button) {
+        const row = button.closest("tr");
+        row.remove();
+}
+
+    // "Добавить строку" и "Удалить" в "материалы"
     function addMaterialRow() {
-        const table = document.getElementById('materialTable').getElementsByTagName('tbody')[0];
-        const newRow = table.insertRow();
-        newRow.innerHTML = `
-            <td><input type="text" name="name_material[]" class="form-control" value=""></td>
-            <td><input type="number" name="price_unit[]" class="form-control" value=""></td>
-            <td><input type="number" name="quantity[]" class="form-control" value=""></td>
-            <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Удалить</button></td>
-        `;
+        var materialTable = document.getElementById("materialTable").getElementsByTagName('tbody')[0];
+        var materialRow = materialTable.insertRow();
+
+        var materialColumns = [
+            { name: 'name[]', type: 'text' },
+            { name: 'price_unit[]', type: 'number' },
+            { name: 'quantity[]', type: 'number' }
+        ];
+
+        for (var i = 0; i < materialColumns.length; i++) {
+            var newCell = materialRow.insertCell(i);
+            var input = document.createElement("input");
+            input.type = materialColumns[i].type;
+            input.name = materialColumns[i].name;
+            input.className = "form-control";
+            newCell.appendChild(input);
+        }
+
+        var buttonCell = materialRow.insertCell(materialColumns.length);
+        var deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "btn btn-outline-danger btn-sm";
+        deleteButton.textContent = "Удалить";
+        deleteButton.onclick = function() {
+            deleteRow(materialRow); // Передаем materialRow в функцию deleteRow
+        };
+        buttonCell.appendChild(deleteButton);
     }
 
-    function removeRow(button) {
-        const row = button.parentNode.parentNode;
-        row.parentNode.removeChild(row);
+    // Функция для удаления строки
+    function deleteRow(button) {
+        const row = button.closest("tr");
+        row.remove();
     }
+
 </script>
 
 {% endblock %}
-
