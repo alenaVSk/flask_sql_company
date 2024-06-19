@@ -7,11 +7,11 @@
 
 <div style="margin-bottom: 20px;"></div>
 
-
 <form action="/save_edit_final_act/{{ entry_data.main.id_act }}" method="post">
+
     <input type="hidden" name="entry_id" value="{{ entry_data.main.id_act }}">
     <input type="hidden" name="date_act" value="{{ entry_data.main.date_act }}">
-    <p>ID акта: {{ entry_data.main.id_act }}</p>
+
     <div class="table-responsive">
         <table id="myTable" class="table table-striped" style="max-width: 100%;">
             <thead>
@@ -37,7 +37,6 @@
 
     <h4>Выполненные работы:</h4>
 
-
     <div class="table-responsive">
         <table id="workTable" class="table table-striped">
             <thead>
@@ -61,7 +60,6 @@
 
         <button type="button" class="btn btn-outline-primary btn-sm" onclick="addWorkRow()">Добавить строку</button>
     </div>
-
 
     <h4>Использованные материалы:</h4>
 
@@ -92,7 +90,7 @@
 
     <div class="container">
         <button type="submit" class="btn btn-outline-primary">Сохранить все изменения</button>
-        <button type="button" class="btn btn-outline-success return-button" onclick="window.location.href = '/showFinal_act'">Вернуться "Акт выполненных работ"</button>
+
     </div>
 </form>
 

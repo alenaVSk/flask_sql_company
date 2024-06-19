@@ -66,12 +66,12 @@ class FDataBase:
 
 
     # Метод для обновления данных в Журнале
-    def update_entry(self, entry_id, date_order, name_customer, brand_car, year_car, number_car, text_order, id_act):
+    def update_entry(self, entry_id, id_act, date_order, name_customer, brand_car, year_car, number_car, text_order):
         try:
             sql = '''UPDATE log 
                      SET date_order = ?, name_customer = ?, brand_car = ?, year_car = ?, number_car = ?, text_order = ?, id_act = ? 
                      WHERE id = ?'''
-            self.__cur.execute(sql, (date_order, name_customer, brand_car, year_car, number_car, text_order, id_act, entry_id))
+            self.__cur.execute(sql, (id_act, date_order, name_customer, brand_car, year_car, number_car, text_order, entry_id))
             self.__db.commit()
         except Exception as e:
             print("Ошибка при обновлении записи в БД:", str(e))
@@ -321,7 +321,7 @@ class FDataBase:
             self.__db.commit()
         except Exception as e:
             self.__db.rollback()
-            print(f"An error occurred while inserting into stock_minus: {e}")
+            print(f"Произошла ошибка при вставке в stock_minus: {e}")
         finally:
             self.__cur.close()
             self.__db.close()

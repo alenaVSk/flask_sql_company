@@ -9,7 +9,10 @@
 <div class="flash {{cat}}">{{msg}}</div>
 {% endfor %}
 <form action="{{url_for('addStock')}}" method="post" class="form-contact">
-<p><label>Название: </label> <input type="text" name="name" value="" style="width: 400px;" required />
+<p style="margin-top: 10px; margin-bottom: 10px;">
+    <label>Название: </label>
+    <textarea class="form-control f-control" name="name" rows="2" required></textarea>
+</p>
 <p><label>Количество: </label> <input type="number" name="quantity" value="" step="1" required />
 <p><label>Цена 1 шт.(без запятой): </label> <input type="number" name="price_unit" value="" step="1" required />
 

@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<h2>Редактировать запись</h2>
+<h2>Редактировать запись </h2>
 <div style="margin-bottom: 20px;"></div>
 
 <form action="/save_entry/{{ entry_data.id }}" method="post" class="form-contact">
-    <p>ID акта: {{ entry_data.id }}</p>
+
     <label for="date_order">Дата заказа:</label>
     <input type="text" id="date_order" name="date_order" value="{{ entry_data.date_order }}" class="form-contact" required ><br><br>
     <label for="name_customer">ФИО клиента:</label>
@@ -17,10 +17,10 @@
     <input type="text" id="year_car" name="year_car" value="{{ entry_data.year_car }}" class="form-contact" required ><br><br>
     <label for="number_car">Номер авто:</label>
     <input type="text" id="number_car" name="number_car" value="{{ entry_data.number_car }}" class="form-contact" required ><br><br>
-    <label for="text_order">Причина обращения:</label>
-    <input type="text" id="text_order" name="text_order" value="{{ entry_data.text_order }}" class="form-contact" style="width: 400px;" required ><br><br>
+    <label for="text_order" style="margin-bottom: 10px;">Причина обращения:</label>
+    <textarea class="form-control f-control" id="text_order" name="text_order" rows="2" style="margin-top: 10px; margin-bottom: 10px;" required>{{ entry_data.text_order }}</textarea>
     <label for="text_order">Номер акта:</label>
-    <input type="text" id="id_act" name="id_act" value="{{ entry_data.id_act }}" class="form-contact" style="width: 100px;" ><br><br>
+    <input type="text" id="id_act" name="id_act" value="{{ entry_data.id_act }}" class="form-contact" style="width: 100px;" readonly ><br><br>
 
 <div class="container">
     <button type="submit" class="btn btn-outline-primary">Сохранить</button>

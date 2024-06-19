@@ -116,3 +116,20 @@ div.content {
     padding: 5px 10px; /* Уменьшение внутреннего отступа */
     line-height: 1.5; /* Регулировка высоты строки текста */
 }
+
+
+.f-control {
+  /* Здесь добавьте стили для вашего поля */
+  resize: vertical;
+  min-height: 100px;
+  border: 1px solid #888888; /* Стандартная граница Bootstrap */
+  border-radius: 4px; /* Стандартный радиус скругления Bootstrap */
+  padding: 0.375rem 0.75rem; /* Стандартное отступы Bootstrap */
+  font-size: 1rem; /* Стандартный размер шрифта Bootstrap */
+  line-height: 1.5; /* Стандартный межстрочный интервал Bootstrap */
+  background-color: #fff; /* Стандартный цвет фона Bootstrap */
+  color: #333333; /* Стандартный цвет текста Bootstrap */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Стандартные переходы Bootstrap */
+}
+
+

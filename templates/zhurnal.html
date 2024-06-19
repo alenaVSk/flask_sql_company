@@ -38,7 +38,8 @@
       <td>{{ row.text_order }}</td>
       <td>{{ row.id_act }}</td>
       <td>
-          <a href="/edit_entry_act/{{ row.id }}" class="btn btn-outline-primary btn-sm">Создать акт</a>
+
+          <button type="button" class="create-act-button btn btn-outline-primary btn-sm" data-entry-id="{{ row.entry_id }}">Составить акт</button>
       </td>
 
       <td>
@@ -85,52 +86,90 @@
 
 
 <!-- Модальное окно -->
-    <div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="responseModalLabel">Результат операции</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="responseMessage">
-                    <!-- Сообщение будет вставлено сюда через JavaScript -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                </div>
+<div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="responseModalLabel">Результат операции</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="responseMessage">
+                <!-- Сообщение будет вставлено сюда через JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
         </div>
     </div>
+</div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-    <!-- JavaScript-код для обработки поиска -->
-  $(document).ready(function() {
+  // Ждем полной загрузки страницы
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("Document is ready");
+
+    // Инициализация Bootstrap Dropdown для всех элементов на странице при загрузке
+    initializeBootstrapDropdowns();
+
+    // Обработчик клика по кнопке создания акта
+    $('.create-act-button').click(function(event) {
+      event.preventDefault(); // Предотвращаем стандартное поведение кнопки
+      var entryId = $(this).data('entry-id');
+      if (!entryId) {
+        console.error("Entry ID is missing for this button");
+        return;
+      }
+
+      console.log("Clicked create act button for entry_id:", entryId);
+
+      fetch('/edit_entry_act/' + entryId)
+        .then(response => {
+          if (response.redirected) {
+            console.log("Redirected to:", response.url);
+            window.location.href = response.url;
+          } else {
+            response.text().then(html => {
+              console.log("Received HTML response");
+              document.open();
+              document.write(html);
+              document.close();
+
+              // Переинициализация Bootstrap JavaScript
+              initializeBootstrapDropdowns();
+            });
+          }
+        })
+        .catch(error => console.error('Ошибка:', error));
+    });
+
+    // Обработчик поиска
     $("#searchInput").on("keyup", function() {
       var value = $(this).val().toLowerCase();
       $("#myTable tbody tr").filter(function() {
         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
       });
     });
-  });
 
-<!-- JavaScript-код модальное окно -->
-
-$(document).ready(function() {
-    console.log("Document is ready");
-    // Получаем параметры из URL
+    // Получаем параметры из URL и показываем модальное окно, если есть сообщение
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status');
     const message = urlParams.get('message');
 
     if (status && message) {
-        console.log("Status:", status, "Message:", message);
-        $('#responseMessage').text(message);
-        var responseModal = new bootstrap.Modal(document.getElementById('responseModal'));
-        responseModal.show();
+      console.log("Status:", status, "Message:", message);
+      $('#responseMessage').text(message);
+      var responseModal = new bootstrap.Modal(document.getElementById('responseModal'));
+      responseModal.show();
     }
-});
+  });
 
+  function initializeBootstrapDropdowns() {
+    var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+    var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+      return new bootstrap.Dropdown(dropdownToggleEl);
+    });
+  }
 </script>
 
 {% endblock %}

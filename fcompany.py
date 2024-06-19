@@ -61,6 +61,11 @@ def showZhurnal():
     page = request.args.get('page', 1, type=int)
     per_page = 10  # Количество элементов на странице
     log_query = dbase.getLog()  # Получаем все элементы журнала
+
+    # Добавляем entry_id в каждую запись в log_query
+    for row in log_query:
+        row['entry_id'] = row['id']
+
     total_items = len(log_query)  # Получаем общее количество элементов
     total_pages = ceil(total_items / per_page)  # Вычисляем общее количество страниц
     start_index = (page - 1) * per_page
@@ -133,10 +138,24 @@ def save_entry(entry_id):
 # Маршрут для составления акта (получение данных из "Журнала" по id)
 @app.route('/edit_entry_act/<int:entry_id>', methods=['GET'])
 def edit_entry_act(entry_id):
-    entry_data = dbase.get_entry(entry_id)
-
-    return render_template('act.html', title="Составить акт выполненных работ", entry_data=entry_data)
-
+    try:
+        entry_data = dbase.get_entry(entry_id)
+        if not entry_data:
+            message = "Запись не найдена"
+            status = 'error'
+        else:
+            act_exists = dbase.check_delete_entry(entry_id)
+            if act_exists and act_exists[0]:
+                message = 'Составление акта запрещено, так как акт уже составлен'
+                status = 'error'
+                return redirect(url_for('showZhurnal', status=status, message=message))
+            else:
+                return render_template('act.html', title="Составить акт выполненных работ", entry_data=entry_data)
+    except Exception as e:
+        print("Ошибка при получении записи из БД:", str(e))
+        message = 'Ошибка при получении записи'
+        status = 'error'
+        return redirect(url_for('showZhurnal', status=status, message=message))
 
 # Маршрут для добавления данных в акт
 @app.route('/save_new_act/<int:entry_id>', methods=['POST'])
@@ -243,7 +262,7 @@ def save_edit_final_act(entry_id):
 @app.route("/stock")
 def showStock():
     page = request.args.get('page', 1, type=int)
-    per_page = 3  # Количество элементов на странице
+    per_page = 10  # Количество элементов на странице
     stock_query = dbase.getStock()  # Получаем все элементы склада
     total_items = len(stock_query)  # Получаем общее количество элементов
     total_pages = ceil(total_items / per_page)  # Вычисляем общее количество страниц
