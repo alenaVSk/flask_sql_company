@@ -2,14 +2,14 @@
 
 {% block content %}
 
-<h2>Склад материалов</h2>
-<div style="margin-bottom: 20px;"></div> <!-- Пространство -->
-
-<!-- Форма поиска -->
-<form class="d-flex" role="search">
-  <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
-  <button class="btn btn-outline-success narrow-button" type="submit">Вернуться "Склад"</button>
-</form>
+<div class="header-container">
+  <h2>Склад материалов</h2>
+  <!-- Форма поиска -->
+  <form class="d-flex search-form" role="search">
+    <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
+    <button class="btn btn-outline-success narrow-button" type="submit">Вернуться "Склад"</button>
+  </form>
+</div>
 
 <table id="myTable" class="table table-striped">
   <thead>

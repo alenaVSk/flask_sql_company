@@ -34,7 +34,7 @@ input.form-control {
 
 
 
-/* кнопка поиска на странице "Журнал" */
+/* кнопка поиска на странице  */
 .narrow-button {
     max-width: 250px; /* Пример фиксированной максимальной ширины */
     white-space: nowrap; /* Предотвращает перенос текста на новую строку */
@@ -49,6 +49,20 @@ input.form-control {
 .form-field {
      font-size: 20px !important; /* Установите желаемый размер шрифта */
         }
+/* расположение заголовка слева и поисковика справа */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.search-form {
+  margin-left: 300px; /* Это отодвинет форму поиска вправо */
+}
+h2 {
+  margin: 0;
+  margin-right: 300px; /* Добавляет отступ справа от заголовка */
+}
 
 html, body {
 	font-family: 'Arial';

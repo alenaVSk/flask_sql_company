@@ -6,7 +6,6 @@
 <div style="margin-bottom: 20px;"></div>
 <!-- Пространство -->
 <div class="table-responsive">
-    <!-- адаптивность для таблицы, не будет выходить за пределы контейнера -->
     <form id="actForm" action="/save_new_act/{{ entry_data.id }}" method="post" class="form-contact" onsubmit="return validateForm()">
         <table id="myTable" class="table table-striped max-width: 100%">
             <thead>
@@ -30,10 +29,7 @@
                 </tr>
             </tbody>
         </table>
-
-
-<h3>Добавить новые данные</h3>
-
+<h3>Добавить данные</h3>
         <table id="actTable" class="table table-striped">
         <thead>
             <tr>
@@ -86,11 +82,9 @@
 </table>
 
     <div class="container">
-            <button type="button" class="btn btn-outline-primary" onclick="addRow()">Добавить строку</button>
             <button type="submit" class="btn btn-outline-primary">Сохранить</button>
-            <button type="button" class="btn btn-outline-success return-button" onclick="window.location.href = '/zhurnal'">Вернуться "Журнал"</button>
+            <button type="button" class="btn btn-outline-success" onclick="window.location.href = '{{ url_for('showZhurnal') }}'">Вернуться в "Журнал"</button>
     </div>
-
 </form>
 </div>
 
@@ -113,26 +107,6 @@
 </div>
 
 <script>
-
-function addRow() {
-    var actTable = document.getElementById("actTable").getElementsByTagName('tbody')[0];
-
-    var actRow = actTable.insertRow();
-
-    var actColumns = [
-        { name: 'id_act[]', type: 'number' },
-        { name: 'date_act[]', type: 'text' }
-    ];
-
-    for (var i = 0; i < actColumns.length; i++) {
-        var newCell = actRow.insertCell(i);
-        var input = document.createElement("input");
-        input.type = actColumns[i].type;
-        input.name = actColumns[i].name;
-        input.className = "form-control";
-        newCell.appendChild(input);
-    }
-}
 
 function addWorkRow() {
     var workTable = document.getElementById("workTable").getElementsByTagName('tbody')[0];
@@ -158,7 +132,8 @@ function addWorkRow() {
     deleteButton.className = "btn btn-outline-danger";
     deleteButton.textContent = "-";
     deleteButton.onclick = function() {
-        workTable.deleteRow(workRow.rowIndex);
+        var row = this.parentNode.parentNode;
+        row.parentNode.removeChild(row);
     };
     buttonCell.appendChild(deleteButton);
 }
@@ -188,7 +163,8 @@ function addMaterialRow() {
     deleteButton.className = "btn btn-outline-danger";
     deleteButton.textContent = "-";
     deleteButton.onclick = function() {
-        materialTable.deleteRow(materialRow.rowIndex);
+        var row = this.parentNode.parentNode;
+        row.parentNode.removeChild(row);
     };
     buttonCell.appendChild(deleteButton);
 }

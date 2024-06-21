@@ -2,14 +2,15 @@
 
 {% block content %}
 
-<h2>Журнал заказов</h2>
 
-<!-- Форма поиска -->
-<form class="d-flex" role="search">
-  <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
-  <button class="btn btn-outline-success narrow-button" type="submit">Вернуться "Журнал"</button>
-</form>
-
+<div class="header-container">
+  <h2>Журнал заказов</h2>
+  <!-- Форма поиска -->
+  <form class="d-flex search-form" role="search">
+    <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
+    <button class="btn btn-outline-success narrow-button" type="submit">Вернуться "Склад"</button>
+  </form>
+</div>
 
 <div class="table-responsive">  <!-- адаптивность для таблицы, не будет выходить за пределы контейнера -->
 <table id="myTable" class="table table-striped max-width: 100%">
@@ -35,13 +36,11 @@
       <td>{{ row.brand_car }}</td>
       <td>{{ row.year_car }}</td>
       <td>{{ row.number_car }}</td>
-      <td>{{ row.text_order }}</td>
+      <td>{{ row.text_order|truncate(30) }}</td>
       <td>{{ row.id_act }}</td>
       <td>
-
-          <button type="button" class="create-act-button btn btn-outline-primary btn-sm" data-entry-id="{{ row.entry_id }}">Составить акт</button>
+            <a href="/edit_entry_act/{{ row.id }}" class="btn btn-outline-primary btn-sm">Составить акт</a>
       </td>
-
       <td>
           <a href="/edit_entry/{{ row.id }}" class="btn btn-outline-primary btn-sm">Изменить</a>
       </td>
@@ -106,7 +105,7 @@
 
 <script>
   // Ждем полной загрузки страницы
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     console.log("Document is ready");
 
     // Инициализация Bootstrap Dropdown для всех элементов на странице при загрузке
@@ -161,6 +160,13 @@
       $('#responseMessage').text(message);
       var responseModal = new bootstrap.Modal(document.getElementById('responseModal'));
       responseModal.show();
+
+      //После показа модального окна, если параметры status и message присутствуют, мы очищаем URL, удаляя эти параметры.
+      // Это делается с помощью window.history.replaceState(), что позволяет изменить URL без перезагрузки страницы.
+      if (window.history.replaceState) {
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+      }
     }
   });
 

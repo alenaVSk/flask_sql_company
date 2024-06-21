@@ -2,13 +2,15 @@
 
 {% block content %}
 
-<h2>Реестр актов выполненных работ</h2>
 
-<!-- Форма поиска -->
-<form class="d-flex" role="search" action="/" method="get">
-  <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
-  <button class="btn btn-outline-success narrow-button" type="button" id="resetButton">Вернуться "Реестр"</button>
-</form>
+<div class="header-container">
+  <h2>Реестр актов выполненных работ</h2>
+  <!-- Форма поиска -->
+  <form class="d-flex search-form" role="search">
+    <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
+    <button class="btn btn-outline-success narrow-button" type="submit">Вернуться "Склад"</button>
+  </form>
+</div>
 
 <div class="table-responsive">  <!-- адаптивность для таблицы, не будет выходить за пределы контейнера -->
 <table id="myTable" class="table table-striped max-width: 100%">

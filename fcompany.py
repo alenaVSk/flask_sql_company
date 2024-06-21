@@ -157,6 +157,52 @@ def edit_entry_act(entry_id):
         status = 'error'
         return redirect(url_for('showZhurnal', status=status, message=message))
 
+
+@app.route('/save_new_act/<int:entry_id>', methods=['POST'])
+def save_new_act(entry_id):
+    print("Получение данных из формы...")
+    id_acts = request.form.getlist('id_act[]')
+    date_acts = request.form.getlist('date_act[]')
+    name_works = request.form.getlist('name_work[]')
+    price_works = request.form.getlist('price_work[]')
+    names = request.form.getlist('name[]')
+    price_units = request.form.getlist('price_unit[]')
+    quantities = request.form.getlist('quantity[]')
+
+    print(f"Полученные данные: id_acts={id_acts}, date_acts={date_acts}, name_works={name_works}, price_works={price_works}, names={names}, price_units={price_units}, quantities={quantities}")
+
+    if not name_works:
+        # Обработка случая, когда данные отсутствуют
+        print("Нет данных для сохранения")
+        return redirect(url_for('edit_entry_act', entry_id=entry_id))
+
+    saved_id_act = None
+    for i in range(len(name_works)):
+        id_act = id_acts[0] if id_acts else None
+        date_act = date_acts[0] if date_acts else None
+        name_work = name_works[i]
+        price_work = price_works[i] if i < len(price_works) else None
+
+        print(f"Сохранение строки {i + 1} в act...")
+        saved_id_act = dbase.save_new_act(id_act, date_act, name_work, price_work)
+        if saved_id_act is not None:
+            if i < len(names):
+                name = names[i]
+                price_unit = price_units[i] if i < len(price_units) else None
+                quantity = quantities[i] if i < len(quantities) else None
+                print(f"Сохранение строки {i + 1} в stock_minus...")
+                dbase.save_new_stock_minus(name, price_unit, quantity, saved_id_act)
+
+    if saved_id_act is not None:
+        print(f"Сохранение id_act={id_act} в log...")
+        dbase.save_id_act_to_log(id_act, entry_id)
+        print("Перенаправление на страницу финального акта...")
+        return redirect(url_for('showFinal_act', entry_id=entry_id))
+    else:
+        print("Не удалось сохранить акт")
+        return redirect(url_for('edit_entry_act', entry_id=entry_id))
+
+"""
 # Маршрут для добавления данных в акт
 @app.route('/save_new_act/<int:entry_id>', methods=['POST'])
 def save_new_act(entry_id):
@@ -188,12 +234,12 @@ def save_new_act(entry_id):
                 print(f"Сохранение строки {i + 1} в stock_minus...")
                 dbase.save_new_stock_minus(name, price_unit, quantity, saved_id_act)
 
+
     print(f"Сохранение id_act={id_acts[0]} в log...")
     dbase.save_id_act_to_log(id_acts[0], entry_id)
 
-    print("Перенаправление на страницу edit_entry_act...")
     return redirect(url_for('edit_entry_act', entry_id=entry_id))  # перенаправить на финальный акт !!!!!!
-
+"""
 
 # Маршрут для перехода в реестр актов
 @app.route("/list_act")
@@ -262,7 +308,7 @@ def save_edit_final_act(entry_id):
 @app.route("/stock")
 def showStock():
     page = request.args.get('page', 1, type=int)
-    per_page = 10  # Количество элементов на странице
+    per_page = 12  # Количество элементов на странице
     stock_query = dbase.getStock()  # Получаем все элементы склада
     total_items = len(stock_query)  # Получаем общее количество элементов
     total_pages = ceil(total_items / per_page)  # Вычисляем общее количество страниц
