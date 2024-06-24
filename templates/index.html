@@ -1,32 +1,110 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-4 col-lg-3 d-md-block bg-light sidebar">
+            <div class="position-sticky pt-3">
+                <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mb-1 text-muted" style="margin-top: -10px;">
+                    <span>Заказы</span>
+                </h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/zhurnal">
+                            Журнал заказов
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/add_customer">
+                            Добавить данные в журнал
+                        </a>
+                    </li>
+                </ul>
+                <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Акт выполненных работ</span>
+                </h5>
+                <ul class="nav flex-column mb-2">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/list_act">
+                            Реестр актов выполненных работ
+                        </a>
+                    </li>
+                </ul>
+              <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Материалы</span>
+                </h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/stock">
+                            Склад
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/add_stock">
+                            Добавить материалы на склад
+                        </a>
+                    </li>
+                </ul>
+              <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Сотрудники</span>
+                </h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/employees">
+                            Список сотрудников
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/add_employees">
+                            Добавить сотрудника в список
+                        </a>
+                    </li>
+                </ul>
+                <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Разное</span>
+                </h5>
+                <ul class="nav flex-column mb-2">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/requisites">
+                            Реквизиты
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
-<nav class="nav flex-column">
+        <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2 ms-5">Добро пожаловать в наше ПО для автосервиса!</h1>
+            </div>
 
-  <div class="breadcrumb-item" style="font-size: 1.2em;">Заказы</div>
-  <a class="nav-link active" style="font-size: 1.2em;" href="/zhurnal">Журнал заказов</a>
-  <a class="nav-link" style="font-size: 1.2em;" href="/add_customer">Добавить данные в журнал</a>
-  <a class="nav-link active" style="font-size: 1.2em;" href= "#"></a>
+  <div class="container mt-3">
 
-  <div class="breadcrumb-item" style="font-size: 1.2em;">Акт выполненных работ</div>
-  <a class="nav-link active" style="font-size: 1.2em;" href="/list_act">Реестр актов выполненных работ</a>
-  <a class="nav-link active" style="font-size: 1.2em;" href="#"></a>
+      <p>Эта система управления заказами и складом предназначена для автоматизации взаимодействия с клиентами и повышения
+        эффективности работы вашего автосервиса.</p>
 
-  <div class="breadcrumb-item" style="font-size: 1.2em;">Материалы</div>
-  <a class="nav-link active" style="font-size: 1.2em;" href="/stock">Склад</a>
-  <a class="nav-link active" style="font-size: 1.2em;" href="/add_stock">Добавить материалы на склад</a>
-  <a class="nav-link active" style="font-size: 1.2em;" href= "#"></a>
+      <h4>Разделы Программы</h4>
 
-  <div class="breadcrumb-item" style="font-size: 1.2em;">Сотрудники</div>
-  <a class="nav-link active" style="font-size: 1.2em;" href="/employees">Список сотрудников</a>
-  <a class="nav-link active" style="font-size: 1.2em;" href="/add_employees">Добавить сотрудника в список</a>
-  <a class="nav-link active" style="font-size: 1.2em;" href= "#"></a>
+      <h4>«Заказы»</h4>
+      <p>В этом разделе ведется журнал заказов, где регистрируются клиенты и данные об их автомобилях. Здесь же составляется
+        акт выполненных работ, что позволяет легко отслеживать состояние каждого заказа.</p>
 
-  <div class="breadcrumb-item" style="font-size: 1.2em;">Разное</div>
-  <a class="nav-link active" style="font-size: 1.2em;" href="/requisites">Реквизиты</a>
-  <a class="nav-link active" style="font-size: 1.2em;" href= "#"></a>
+      <h4>«Акт выполненных работ»</h4>
+      <p>Этот раздел позволяет вести реестр актов выполненных работ. Вы можете просматривать, редактировать и хранить все
+        акты, обеспечивая точный учет выполненных услуг.</p>
 
-</nav>
+      <h4>«Материалы»</h4>
+      <p>Раздел предназначен для ведения складского учета. Здесь вы можете отслеживать наличие и движение материалов,
+        необходимых для выполнения заказов, что помогает поддерживать оптимальный уровень запасов на складе.</p>
+
+      <h4>«Сотрудники» и «Разное»</h4>
+      <p>В этом разделе собрана справочная информация о предприятии. Вы можете хранить данные о сотрудниках, реквизиты
+        предприятия и другую важную информацию, которая поможет в управлении автосервисом.</p>
+  </div>
+
+        </main>
+    </div>
+</div>
 
 {% endblock %}
+
