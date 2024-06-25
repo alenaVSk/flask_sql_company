@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Акт выполненных работ  № {{ entry_data.main.id_act }} </title>
+</head>
+<body class="print-page">
+    <div class="print-header">
+        <h2>Акт выполненных работ № {{ entry_data.main.id_act }} от {{ entry_data.main.date_act }}</h2>
+    </div>
+
+    <div class="print-content">
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th>ФИО клиента</th>
+                    <th>Марка авто</th>
+                    <th>Год выпуска</th>
+                    <th>Номер авто</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ entry_data.main.name_customer }}</td>
+                    <td>{{ entry_data.main.brand_car }}</td>
+                    <td>{{ entry_data.main.year_car }}</td>
+                    <td>{{ entry_data.main.number_car }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h4>Выполненные работы:</h4>
+    <div class="print-content">
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th>Наименование работ</th>
+                    <th>Стоимость работ (руб)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work in entry_data.works %}
+                <tr>
+                    <td>{{ work.name_work }}</td>
+                    <td>{{ ('%.2f' % (work.price_work / 100) ) | replace('.', ',') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="print-totals">
+        <p>Общая стоимость работ: {{ ('%.2f' % (entry_data.main.total_work / 100) ) | replace('.', ',') }} руб.</p>
+    </div>
+
+    <h4>Использованные материалы:</h4>
+    <div class="print-content">
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th>Наименование материалов</th>
+                    <th>Цена за ед (руб)</th>
+                    <th>Количество</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in entry_data.materials %}
+                <tr>
+                    <td>{{ material.name }}</td>
+                    <td>{{ ('%.2f' % (material.price_unit / 100) ) | replace('.', ',') }}</td>
+                    <td>{{ material.quantity }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="print-totals">
+        <p>Общая стоимость материалов: {{ ('%.2f' % (entry_data.main.total_materials / 100) ) | replace('.', ',') }} руб.</p>
+        <h4>Итоговая стоимость: {{ ('%.2f' % (entry_data.main.total_price / 100) ) | replace('.', ',') }} руб.</h4>
+    </div>
+
+    <div class="print-footer">
+        <p>Подпись: _____________  (Мастер ______________ )</p>
+    </div>
+</body>
+</html>

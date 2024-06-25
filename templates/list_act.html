@@ -2,7 +2,6 @@
 
 {% block content %}
 
-
 <div class="header-container">
   <h2>Реестр актов выполненных работ</h2>
   <!-- Форма поиска -->
@@ -46,7 +45,10 @@
         </td>
         <td>
             <a href="/edit_final_act/{{ row.id_act }}" class="btn btn-outline-primary btn-sm">Изменить</a>
-      </td>
+        </td>
+        <td>
+            <a href="/print_act/{{ row.id_act }}" class="btn btn-outline-primary btn-sm">PDF</a>
+        </td>
     </tr>
     {% endfor %}
 

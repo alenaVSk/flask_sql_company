@@ -1,8 +1,10 @@
 import sqlite3
 import os
-from flask import Flask, render_template, url_for, request, g, flash, redirect
+from flask import Flask, render_template, url_for, request, g, flash, redirect, send_file
 from FDataBase import FDataBase
 from math import ceil
+from weasyprint import HTML
+import io
 
 
 # конфигурация
@@ -202,44 +204,6 @@ def save_new_act(entry_id):
         print("Не удалось сохранить акт")
         return redirect(url_for('edit_entry_act', entry_id=entry_id))
 
-"""
-# Маршрут для добавления данных в акт
-@app.route('/save_new_act/<int:entry_id>', methods=['POST'])
-def save_new_act(entry_id):
-    print("Получение данных из формы...")
-    id_acts = request.form.getlist('id_act[]')
-    date_acts = request.form.getlist('date_act[]')
-    name_works = request.form.getlist('name_work[]')
-    price_works = request.form.getlist('price_work[]')
-    names = request.form.getlist('name[]')
-    price_units = request.form.getlist('price_unit[]')
-    quantities = request.form.getlist('quantity[]')
-
-    print(f"Полученные данные: id_acts={id_acts}, date_acts={date_acts}, name_works={name_works}, price_works={price_works}, names={names}, price_units={price_units}, quantities={quantities}")
-
-    for i in range(len(name_works)):
-        id_act = id_acts[0]  # Предполагаем, что id_act и date_act одинаковы для всех строк
-        date_act = date_acts[0]
-        name_work = name_works[i]
-        price_work = price_works[i]
-
-        print(f"Сохранение строки {i + 1} в act...")
-        saved_id_act = dbase.save_new_act(id_act, date_act, name_work, price_work)
-        if saved_id_act is not None:
-            # Поскольку materials тоже имеют несколько строк, используем i для их индексации
-            if i < len(names):
-                name = names[i]
-                price_unit = price_units[i]
-                quantity = quantities[i]
-                print(f"Сохранение строки {i + 1} в stock_minus...")
-                dbase.save_new_stock_minus(name, price_unit, quantity, saved_id_act)
-
-
-    print(f"Сохранение id_act={id_acts[0]} в log...")
-    dbase.save_id_act_to_log(id_acts[0], entry_id)
-
-    return redirect(url_for('edit_entry_act', entry_id=entry_id))  # перенаправить на финальный акт !!!!!!
-"""
 
 # Маршрут для перехода в реестр актов
 @app.route("/list_act")
@@ -269,6 +233,25 @@ def showFinal_act(entry_id):
     entry_data = dbase.get_final_act(entry_id)
 
     return render_template('final_act.html', title="Акт выполненных работ", entry_data=entry_data)
+
+# Маршрут для отображения финального акта в PDF
+@app.route('/print_act/<int:entry_id>')
+def print_act(entry_id):
+    # Получение данных для акта выполненных работ
+    entry_data = dbase.get_final_act(entry_id)
+
+    # Рендеринг HTML с использованием шаблона и данных
+    html = render_template('print_act.html', title="Акт выполненных работ", entry_data=entry_data)
+
+    # Генерация PDF из HTML
+    pdf_file = HTML(string=html).write_pdf()
+
+    # Используем BytesIO для хранения PDF в памяти
+    pdf_io = io.BytesIO(pdf_file)
+    pdf_io.seek(0)  # Устанавливаем указатель чтения в начало
+
+    # Отправляем PDF пользователю
+    return send_file(pdf_io, download_name='act_vypolnennykh_rabot.pdf', as_attachment=True, mimetype='application/pdf')
 
 
 # Маршрут для редактирования финального акта
