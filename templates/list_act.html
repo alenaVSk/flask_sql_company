@@ -7,7 +7,7 @@
   <!-- Форма поиска -->
   <form class="d-flex search-form" role="search">
     <input class="form-control me-2 narrow-search" type="search" id="searchInput" placeholder="Поиск" aria-label="Search">
-    <button class="btn btn-outline-success narrow-button" type="submit">Вернуться "Склад"</button>
+    <button class="btn btn-outline-success narrow-button" type="submit">Вернуться "Реестр"</button>
   </form>
 </div>
 
@@ -17,11 +17,11 @@
   <thead>
     <tr>
       <th scope="col" style="width: 50px;">Номер акта</th>
-      <th scope="col" style="width: 50px;">Дата акта</th>
-      <th scope="col" style="width: 200px;">ФИО клиента</th>
-      <th scope="col" style="width: 150px;">Марка авто</th>
+      <th scope="col" style="width: 100px;">Дата акта</th>
+      <th scope="col" style="width: 250px;">ФИО клиента</th>
+      <th scope="col" style="width: 200px;">Марка авто</th>
       <th scope="col" style="width: 50px;">Год выпуска</th>
-      <th scope="col" style="width: 100px;">Номер авто</th>
+      <th scope="col" style="width: 150px;">Номер авто</th>
       <th scope="col" style="width: 50px;">Стоимость работ(руб)</th>
       <th scope="col" style="width: 50px;">Стоимость материалов(руб)</th>
       <th scope="col" style="width: 100px;">Итоговая стоимость(руб)</th>
@@ -85,26 +85,23 @@
 <!-- JavaScript-код для обработки поиска -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    console.log("jQuery version:", $.fn.jquery);
   $(document).ready(function() {
-    // Событие для фильтрации таблицы при вводе текста
-    $("#searchInput").on("keyup", function() {
-      var value = $(this).val().toLowerCase();
-      filterTable(value);
+  function filterTable(value) {
+    $("#myTable tbody tr").each(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
     });
+  }
 
-    // Функция фильтрации таблицы
-    function filterTable(value) {
-      $("#myTable tbody tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-      });
-    }
-
-    // Сброс фильтрации и поля поиска
-    $("#resetButton").on("click", function() {
-      $("#searchInput").val('');
-      filterTable('');
-    });
+  $("#searchInput").on("input", function() {
+    filterTable($(this).val().toLowerCase());
   });
+
+  $("#resetButton").on("click", function() {
+    $("#searchInput").val('');
+    filterTable('');
+  });
+});
 </script>
 
 {% endblock %}

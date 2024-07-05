@@ -28,13 +28,13 @@
     width: 25%;
 }
 
-/* Ограничение ширины поля для "Причина обращения" в "Журнал"*/
+/* Ограничение ширины поля для "Причина обращения" в "Журнал"
 #col-6, td:nth-child(6) {
     max-width: 15px; /* Задайте максимальную ширину */
-    white-space: nowrap;
+    /* white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
+}*/
 
 input.form-control {
     width: 100%; /* Ширина input элементов */

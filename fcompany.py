@@ -6,7 +6,6 @@ from math import ceil
 from weasyprint import HTML
 import io
 
-
 # конфигурация
 DATABASE = '/tmp/fcompany.db'  # путь к БД
 DEBUG = True
@@ -25,6 +24,7 @@ def connect_db():  # общая функция для установления �
     conn = sqlite3.connect(app.config['DATABASE'])
     conn.row_factory = sqlite3.Row  # записи будут представлены не в виде кортежей, а в виде словаря (для исп в шаблонах)
     return conn
+
 
 def create_db():
     """Вспомогательная функция для создания таблиц БД (без запуска вебсервера)"""
@@ -85,7 +85,6 @@ def showZhurnal():
 @app.route("/add_customer", methods=["POST", "GET"])
 def addCustomer():
     if request.method == "POST":
-
         res = dbase.addCustomer(request.form['date_order'], request.form['name_customer'], request.form['brand_car'],
                                 request.form['year_car'], request.form['number_car'], request.form['text_order'], request.form['id_act'])
         if not res:
@@ -115,11 +114,12 @@ def delete_entry(entry_id):
 
     return redirect(url_for('showZhurnal', status=status, message=message))
 
+
 # Маршрут для страницы редактирования записи записи в "Журнал"
 @app.route('/edit_entry/<int:entry_id>', methods=['GET'])
 def edit_entry(entry_id):
     entry_data = dbase.get_entry(entry_id)
-    print('entry_data', entry_data)  # Проверка, получены ли данные
+
     return render_template('edit_entry.html', title="Редактировать", entry_data=entry_data)
 
 
@@ -134,6 +134,7 @@ def save_entry(entry_id):
     text_order = request.form['text_order']
     id_act = request.form['id_act']
     dbase.update_entry(entry_id, date_order, name_customer, brand_car, year_car, number_car, text_order, id_act)
+
     return redirect(url_for('showZhurnal'))
 
 
@@ -148,11 +149,12 @@ def edit_entry_act(entry_id):
         else:
             act_exists = dbase.check_delete_entry(entry_id)
             if act_exists and act_exists[0]:
-                message = 'Составление акта запрещено, так как акт уже составлен'
+                message = 'Составление акта запрещено, так как акт составлен'
                 status = 'error'
                 return redirect(url_for('showZhurnal', status=status, message=message))
             else:
                 return render_template('act.html', title="Составить акт выполненных работ", entry_data=entry_data)
+
     except Exception as e:
         print("Ошибка при получении записи из БД:", str(e))
         message = 'Ошибка при получении записи'
@@ -162,7 +164,6 @@ def edit_entry_act(entry_id):
 
 @app.route('/save_new_act/<int:entry_id>', methods=['POST'])
 def save_new_act(entry_id):
-    print("Получение данных из формы...")
     id_acts = request.form.getlist('id_act[]')
     date_acts = request.form.getlist('date_act[]')
     name_works = request.form.getlist('name_work[]')
@@ -170,8 +171,6 @@ def save_new_act(entry_id):
     names = request.form.getlist('name[]')
     price_units = request.form.getlist('price_unit[]')
     quantities = request.form.getlist('quantity[]')
-
-    print(f"Полученные данные: id_acts={id_acts}, date_acts={date_acts}, name_works={name_works}, price_works={price_works}, names={names}, price_units={price_units}, quantities={quantities}")
 
     if not name_works:
         # Обработка случая, когда данные отсутствуют
@@ -185,30 +184,27 @@ def save_new_act(entry_id):
         name_work = name_works[i]
         price_work = price_works[i] if i < len(price_works) else None
 
-        print(f"Сохранение строки {i + 1} в act...")
         saved_id_act = dbase.save_new_act(id_act, date_act, name_work, price_work)
         if saved_id_act is not None:
             if i < len(names):
                 name = names[i]
                 price_unit = price_units[i] if i < len(price_units) else None
                 quantity = quantities[i] if i < len(quantities) else None
-                print(f"Сохранение строки {i + 1} в stock_minus...")
+
                 dbase.save_new_stock_minus(name, price_unit, quantity, saved_id_act)
 
     if saved_id_act is not None:
-        print(f"Сохранение id_act={id_act} в log...")
         dbase.save_id_act_to_log(id_act, entry_id)
-        print("Перенаправление на страницу финального акта...")
+
         return redirect(url_for('showFinal_act', entry_id=entry_id))
     else:
-        print("Не удалось сохранить акт")
+
         return redirect(url_for('edit_entry_act', entry_id=entry_id))
 
 
 # Маршрут для перехода в реестр актов
 @app.route("/list_act")
 def showList_act():
-
     page = request.args.get('page', 1, type=int)
     per_page = 10  # Количество элементов на странице
     list_act_query = dbase.getList_act()  # Получаем все элементы реестра
@@ -229,10 +225,10 @@ def showList_act():
 # Маршрут для отображения финального акта (получение данных из "Реестра" по id)
 @app.route('/final_act/<int:entry_id>')
 def showFinal_act(entry_id):
-    print('entry_id: ', entry_id)
     entry_data = dbase.get_final_act(entry_id)
 
     return render_template('final_act.html', title="Акт выполненных работ", entry_data=entry_data)
+
 
 # Маршрут для отображения финального акта в PDF
 @app.route('/print_act/<int:entry_id>')
@@ -258,30 +254,23 @@ def print_act(entry_id):
 @app.route('/edit_final_act/<int:entry_id>')
 def edit_final_act(entry_id):
     entry_data = dbase.get_final_act(entry_id)
-    print(f"Entry data: {entry_data}")
-    print('edit_final_ac - entry_id: ', entry_id)
+
     return render_template('edit_final_act.html', title="Редактировать", entry_data=entry_data)
 
 
 # Маршрут для сохранения изменённых и/или добавленных данных в финальном акте
 @app.route('/save_edit_final_act/<int:entry_id>', methods=['POST'])
 def save_edit_final_act(entry_id):
-
     name_works = request.form.getlist('name_work[]')
     price_works = request.form.getlist('price_work[]')
     names = request.form.getlist('name[]')
     price_units = request.form.getlist('price_unit[]')
     quantities = request.form.getlist('quantity[]')
     date_act = request.form.get('date_act')  # Добавляем получение даты акта из формы
-    print(
-        f"Полученные данные: date_act={date_act}, name_works={name_works}, price_works={price_works}, names={names}, price_units={price_units}, quantities={quantities}")
 
     new_act_values = [(name_work, price_work) for name_work, price_work in zip(name_works, price_works)]
     new_stock_minus_values = [(name, price_unit, quantity) for name, price_unit, quantity in
                               zip(names, price_units, quantities)]
-
-    print(f"new_act_values: {new_act_values}")
-    print(f"new_stock_minus_values: {new_stock_minus_values}")
 
     dbase.update_act_and_stock_minus(entry_id, date_act, new_act_values, new_stock_minus_values)
 
@@ -310,7 +299,6 @@ def showStock():
 @app.route("/add_stock", methods=["POST", "GET"])
 def addStock():
     if request.method == "POST":
-
         res = dbase.addStock(request.form['name'], request.form['quantity'], request.form['price_unit'])
         if not res:
             flash('Ошибка добавления', category='error')
@@ -328,7 +316,6 @@ def showEmployees():
 @app.route("/add_employees", methods=["POST", "GET"])
 def addEmployees():
     if request.method == "POST":
-
         res = dbase.addEmployees(request.form['name'], request.form['profession'])
         if not res:
             flash('Ошибка добавления', category='error')
@@ -353,7 +340,7 @@ def delete_entry_employees(entry_id):
 @app.route('/edit_entry_employees/<int:entry_id>', methods=['GET'])
 def edit_entry_employees(entry_id):
     entry_data = dbase.get_entry_employees(entry_id)
-    # print(entry_data)  # Проверка, получены ли данные
+
     return render_template('edit_entry_employees.html', title="Редактировать", entry_data=entry_data)
 
 
@@ -363,6 +350,7 @@ def save_entry_employees(entry_id):
     name = request.form['name']
     profession = request.form['profession']
     dbase.update_entry_employees(entry_id, name, profession)
+
     return redirect(url_for('showEmployees'))
 
 
@@ -379,4 +367,5 @@ def close_db(error):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
+

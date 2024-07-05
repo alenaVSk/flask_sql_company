@@ -6,6 +6,7 @@ class FDataBase:
         self.__db = db
         self.__cur = db.cursor()
 
+
     def getLog(self):
         sql = '''SELECT * FROM log'''
         try:
@@ -51,7 +52,6 @@ class FDataBase:
             print("Ошибка удаления из БД:", str(e))
             self.__db.rollback()
 
-
     # Метод для перехода из "Журнала" по данной записи (по entry_id)
     def get_entry(self, entry_id):
         sql = '''SELECT * FROM log WHERE id = ?'''
@@ -63,7 +63,6 @@ class FDataBase:
         except Exception as e:
             print("Ошибка при получении записи из БД:", str(e))
         return None
-
 
     # Метод для обновления данных в Журнале
     def update_entry(self, entry_id, id_act, date_order, name_customer, brand_car, year_car, number_car, text_order):
@@ -77,7 +76,6 @@ class FDataBase:
             print("Ошибка при обновлении записи в БД:", str(e))
             self.__db.rollback()
 
-
     # Метод для добавления данных в act
     def save_new_act(self, id_act, date_act, name_work, price_work):
         sql = """
@@ -85,11 +83,9 @@ class FDataBase:
             VALUES (?, ?, ?, ?)
         """
         try:
-            print(
-                f"Сохранение в act: id_act={id_act}, date_act={date_act}, name_work={name_work}, price_work={price_work}")
             self.__cur.execute(sql, (id_act, date_act, name_work, price_work))
             self.__db.commit()
-            print(f"Данные успешно сохранены в act")
+
             return id_act
         except Exception as e:
             print(f"Ошибка при сохранении новых данных в БД act: {str(e)}")
@@ -102,11 +98,8 @@ class FDataBase:
             VALUES (?, ?, ?, ?)
         """
         try:
-            print(
-                f"Сохранение в stock_minus: name={name}, price_unit={price_unit}, quantity={quantity}, id_act={id_act}")
             self.__cur.execute(sql, (name, price_unit, quantity, id_act))
             self.__db.commit()
-            print("Данные успешно сохранены в stock_minus")
         except Exception as e:
             print("Ошибка при сохранении новых данных в БД stock_minus:", str(e))
 
@@ -188,7 +181,6 @@ class FDataBase:
         return []
 
         # Метод для перехода из "Реестра актов" по данной записи (по entry_id)
-
     def get_final_act(self, entry_id):
         sql_main = '''
         SELECT 
@@ -274,17 +266,14 @@ class FDataBase:
             print("Ошибка при получении записи из БД:", str(e))
         return None
 
-
         # Метод для обновления (добавления/удаления) данных в final act
     def delete_act_rows(self, entry_id):
         sql = "DELETE FROM act WHERE id_act = ?"
         self.__cur.execute(sql, (entry_id,))
-        print(f"Удалены записи из act для id_act={entry_id}")
 
     def delete_stock_minus_rows(self, entry_id):
         sql = "DELETE FROM stock_minus WHERE id_act = ?"
         self.__cur.execute(sql, (entry_id,))
-        print(f"Удалены записи из stock_minus для id_act={entry_id}")
 
     def insert_act_row(self, entry_id, date_act, name_work, price_work):
         sql = """
@@ -292,7 +281,6 @@ class FDataBase:
             VALUES (?, ?, ?, ?)
         """
         self.__cur.execute(sql, (entry_id, date_act, name_work, price_work))
-        print(f"Новая запись успешно добавлена в act для id_act={entry_id}")
 
     def insert_stock_minus_row(self, entry_id, name, price_unit, quantity):
         sql = """
@@ -300,7 +288,6 @@ class FDataBase:
             VALUES (?, ?, ?, ?)
         """
         self.__cur.execute(sql, (entry_id, name, price_unit, quantity))
-        print(f"Новая запись успешно добавлена в stock_minus для id_act={entry_id}")
 
     def update_act_and_stock_minus(self, entry_id, date_act, new_act_values, new_stock_minus_values):
         try:
@@ -413,7 +400,6 @@ class FDataBase:
         except Exception as e:
             print("Ошибка при получении записи из БД:", str(e))
         return None
-
 
     # Метод для обновления данных о сотрудниках
     def update_entry_employees(self, entry_id, name, profession):
