@@ -1,45 +1,74 @@
-import sqlite3
-import os
 from flask import Flask, render_template, url_for, request, g, flash, redirect, send_file
+import psycopg2
+from psycopg2.extras import DictCursor
+import os
 from FDataBase import FDataBase
 from math import ceil
 from weasyprint import HTML
 import io
 
-# конфигурация
-DATABASE = '/tmp/fcompany.db'  # путь к БД
-DEBUG = True
-SECRET_KEY = 'fdgfh78@#5?>gfhf89dx,v06k'
-USERNAME = 'admin'
-PASSWORD = '123'
-
 
 app = Flask(__name__)
-app.config.from_object(__name__)  # загружаем конфигурацию из приложения (__name__ ссылается на этот текущий модуль)
 
-app.config.update(dict(DATABASE=os.path.join(app.root_path,'fcompany.db'))) # переопределим путь к БД(ссылка на тек каталог
+app.config['SECRET_KEY'] = 'fdgfh78@#5?>gfhf89dx,v06k'
 
 
-def connect_db():  # общая функция для установления соединения с БД
-    conn = sqlite3.connect(app.config['DATABASE'])
-    conn.row_factory = sqlite3.Row  # записи будут представлены не в виде кортежей, а в виде словаря (для исп в шаблонах)
+def init_db():    # Инициализация базы данных
+    conn = psycopg2.connect(
+        host=os.getenv('DB_HOST', 'localhost'),
+        database=os.getenv('DB_NAME', 'fcompany'),
+        user=os.getenv('DB_USER', 'postgres'),
+        password=os.getenv('DB_PASSWORD', 'elena')
+    )
+    try:
+        with conn.cursor() as cur:
+            with app.open_resource('sq_db.sql', mode='r') as f:
+                cur.execute(f.read())
+        conn.commit()
+        print("Database initialized successfully")
+    except Exception as e:
+        print(f"Error initializing database: {e}")
+    finally:
+        conn.close()
+
+
+def connect_db():
+    """Функция для установления соединения с базой данных PostgreSQL."""
+    conn = psycopg2.connect(
+        host=os.getenv('DB_HOST', 'localhost'),
+        database=os.getenv('DB_NAME', 'fcompany'),
+        user=os.getenv('DB_USER', 'postgres'),
+        password=os.getenv('DB_PASSWORD', 'elena')
+    )
+    conn.cursor_factory = DictCursor  # Это аналог row_factory = sqlite3.Row
     return conn
 
 
 def create_db():
     """Вспомогательная функция для создания таблиц БД (без запуска вебсервера)"""
-    db = connect_db()
-    with app.open_resource('sq_db.sql', mode='r') as f:  # откр файл для чтения
-        db.cursor().executescript(f.read())      # выполняем скрипт кот находится в файле
-    db.commit()             # применить изменения к текущей БД
-    db.close()             # закрыть установленное соединение
+    db = None
+    try:
+        db = connect_db()
+        with app.open_resource('sq_db.sql', mode='r') as f:
+            with db.cursor() as cursor:
+                cursor.execute(f.read())
+        db.commit()
+    except psycopg2.Error as e:
+        print(f"Error creating database: {e}")
+        # Можно добавить логирование ошибки
+    except IOError as e:
+        print(f"Error reading SQL file: {e}")
+        # Можно добавить логирование ошибки
+    finally:
+        if db is not None:
+            db.close()
 
 
 def get_db():
     '''Соединение с БД, если оно еще не установлено'''
-    if not hasattr(g, 'link_db'):
-        g.link_db = connect_db()
-    return g.link_db
+    if not hasattr(g, 'db'):
+        g.db = connect_db()
+    return g.db
 
 
 dbase = None
@@ -56,6 +85,10 @@ def before_request():
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route('/test')
+def test():
+    return "Test successful!"
 
 
 @app.route("/zhurnal")
@@ -115,7 +148,7 @@ def delete_entry(entry_id):
     return redirect(url_for('showZhurnal', status=status, message=message))
 
 
-# Маршрут для страницы редактирования записи записи в "Журнал"
+# Маршрут для страницы редактирования записи в "Журнал"
 @app.route('/edit_entry/<int:entry_id>', methods=['GET'])
 def edit_entry(entry_id):
     entry_data = dbase.get_entry(entry_id)
@@ -159,6 +192,7 @@ def edit_entry_act(entry_id):
         print("Ошибка при получении записи из БД:", str(e))
         message = 'Ошибка при получении записи'
         status = 'error'
+
         return redirect(url_for('showZhurnal', status=status, message=message))
 
 
@@ -171,19 +205,22 @@ def save_new_act(entry_id):
     names = request.form.getlist('name[]')
     price_units = request.form.getlist('price_unit[]')
     quantities = request.form.getlist('quantity[]')
-
+    print('1', id_acts, 'id_acts', date_acts, 'date_acts', name_works, 'name_works', entry_id, 'entry_id')
     if not name_works:
         # Обработка случая, когда данные отсутствуют
         print("Нет данных для сохранения")
+
         return redirect(url_for('edit_entry_act', entry_id=entry_id))
+
 
     saved_id_act = None
     for i in range(len(name_works)):
-        id_act = id_acts[0] if id_acts else None
-        date_act = date_acts[0] if date_acts else None
+        id_act = id_acts[0] if id_acts and id_acts[0] is not None else None
+        date_act = date_acts[0] if date_acts and date_acts[0] is not None else None
         name_work = name_works[i]
         price_work = price_works[i] if i < len(price_works) else None
 
+        print('2', id_act, 'id_act', date_act, 'date_act...', saved_id_act, 'saved_id_act' , entry_id, 'entry_id')
         saved_id_act = dbase.save_new_act(id_act, date_act, name_work, price_work)
         if saved_id_act is not None:
             if i < len(names):
@@ -194,11 +231,10 @@ def save_new_act(entry_id):
                 dbase.save_new_stock_minus(name, price_unit, quantity, saved_id_act)
 
     if saved_id_act is not None:
-        dbase.save_id_act_to_log(id_act, entry_id)
+        dbase.save_id_act_to_log(saved_id_act, entry_id)
 
-        return redirect(url_for('showFinal_act', entry_id=entry_id))
+        return redirect(url_for('showZhurnal', entry_id=entry_id))
     else:
-
         return redirect(url_for('edit_entry_act', entry_id=entry_id))
 
 
@@ -362,10 +398,11 @@ def requisites():
 @app.teardown_appcontext
 def close_db(error):
     '''Закрываем соединение с БД, если оно было установлено'''
-    if hasattr(g, 'link_db'):
-        g.link_db.close()
+    if hasattr(g, 'db'):
+        g.db.close()
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=False)
-
+    with app.app_context():
+        init_db()
+    app.run(host='0.0.0.0', port=5000, debug=True)

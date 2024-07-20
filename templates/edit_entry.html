@@ -20,7 +20,8 @@
     <label for="text_order" style="margin-bottom: 10px;">Причина обращения:</label>
     <textarea class="form-control f-control" id="text_order" name="text_order" rows="2" style="margin-top: 10px; margin-bottom: 10px;" required>{{ entry_data.text_order }}</textarea>
     <label for="text_order">Номер акта:</label>
-    <input type="text" id="id_act" name="id_act" value="{{ entry_data.id_act }}" class="form-contact" style="width: 100px;" readonly ><br><br>
+    <input type="number" id="id_act" name="id_act" value="{{ entry_data.id_act }}" class="form-contact" style="width: 100px;"  ><br><br>
+        <!-- <input type="number" id="id_act" name="id_act" value="{{ entry_data.id_act }}" class="form-contact" style="width: 100px;" readonly ><br><br> для отладки -->
 
 <div class="container">
     <button type="submit" class="btn btn-outline-primary">Сохранить</button>

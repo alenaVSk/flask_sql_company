@@ -37,7 +37,7 @@
       <td>{{ row.year_car }}</td>
       <td>{{ row.number_car }}</td>
       <td>{{ row.text_order|truncate(30) }}</td>
-      <td>{{ row.id_act }}</td>
+      <td>{{ row.id_act|default('', true) }}</td>   <!-- замена на пусто, если none -->
       <td>
             <a href="/edit_entry_act/{{ row.id }}" class="btn btn-outline-primary btn-sm">Составить акт</a>
       </td>
