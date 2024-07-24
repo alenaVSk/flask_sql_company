@@ -5,3 +5,4 @@ __pycache__
 *.pyd
 .git
 .gitignore
+sq_db.sql

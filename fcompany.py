@@ -13,25 +13,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'fdgfh78@#5?>gfhf89dx,v06k'
 
 
-def init_db():    # Инициализация базы данных
-    conn = psycopg2.connect(
-        host=os.getenv('DB_HOST', 'localhost'),
-        database=os.getenv('DB_NAME', 'fcompany'),
-        user=os.getenv('DB_USER', 'postgres'),
-        password=os.getenv('DB_PASSWORD', 'elena')
-    )
-    try:
-        with conn.cursor() as cur:
-            with app.open_resource('sq_db.sql', mode='r') as f:
-                cur.execute(f.read())
-        conn.commit()
-        print("Database initialized successfully")
-    except Exception as e:
-        print(f"Error initializing database: {e}")
-    finally:
-        conn.close()
-
-
 def connect_db():
     """Функция для установления соединения с базой данных PostgreSQL."""
     conn = psycopg2.connect(
@@ -85,10 +66,6 @@ def before_request():
 @app.route("/")
 def index():
     return render_template("index.html")
-
-@app.route('/test')
-def test():
-    return "Test successful!"
 
 
 @app.route("/zhurnal")
@@ -403,6 +380,5 @@ def close_db(error):
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        init_db()
     app.run(host='0.0.0.0', port=5000, debug=True)
+

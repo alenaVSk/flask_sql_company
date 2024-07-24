@@ -18,7 +18,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-COPY sq_db.sql /app/sq_db.sql
+COPY dump_fcompany_pg.sql /app/dump_fcompany_pg.sql
 
 EXPOSE 5000
 
