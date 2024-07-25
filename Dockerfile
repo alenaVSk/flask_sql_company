@@ -22,5 +22,6 @@ COPY dump_fcompany_pg.sql /app/dump_fcompany_pg.sql
 
 EXPOSE 5000
 
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "fcompany:app"]
+#CMD ["gunicorn", "-b", "0.0.0.0:5000", "fcompany:app"]    - вернуть после деплоя на heroky
 
+CMD ["gunicorn", "-b", "0.0.0.0:$PORT", "fcompany:app"]
