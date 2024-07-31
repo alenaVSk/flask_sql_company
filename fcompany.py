@@ -6,13 +6,14 @@ from FDataBase import FDataBase
 from math import ceil
 from weasyprint import HTML
 import io
+from urllib.parse import urlparse
 
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'fdgfh78@#5?>gfhf89dx,v06k'
 
-
+'''
 def connect_db():
     """Функция для установления соединения с базой данных PostgreSQL."""
     conn = psycopg2.connect(
@@ -24,6 +25,22 @@ def connect_db():
     conn.cursor_factory = DictCursor  # Это аналог row_factory = sqlite3.Row
     return conn
 
+'''
+
+def connect_db():  # для деплоя на heroku
+    """Функция для установления соединения с базой данных PostgreSQL."""
+    database_url = os.environ['DATABASE_URL']
+    url = urlparse(database_url)
+    conn = psycopg2.connect(
+        dbname=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port,
+        sslmode='require'
+    )
+    conn.cursor_factory = DictCursor  # Сохраняем использование DictCursor
+    return conn
 
 def create_db():
     """Вспомогательная функция для создания таблиц БД (без запуска вебсервера)"""
@@ -159,9 +176,8 @@ def edit_entry_act(entry_id):
         else:
             act_exists = dbase.check_delete_entry(entry_id)
             if act_exists and act_exists[0]:
-                message = 'Составление акта запрещено, так как акт составлен'
-                status = 'error'
-                return redirect(url_for('showZhurnal', status=status, message=message))
+
+                return redirect(url_for('showFinal_act', entry_id=entry_id))
             else:
                 return render_template('act.html', title="Составить акт выполненных работ", entry_data=entry_data)
 
