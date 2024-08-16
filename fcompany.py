@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'fdgfh78@#5?>gfhf89dx,v06k'
+app.config['SECRET_KEY'] = 'token'
 
 '''
 def connect_db():
