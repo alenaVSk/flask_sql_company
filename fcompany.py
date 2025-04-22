@@ -13,8 +13,8 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'fdgfh78@#5?>gfhf89dx,v06k'
 
-
-def connect_db():       # для соед с БД на локальном компе
+'''
+def connect_db():
     """Функция для установления соединения с базой данных PostgreSQL."""
     conn = psycopg2.connect(
         host=os.getenv('DB_HOST', 'localhost'),
@@ -26,7 +26,6 @@ def connect_db():       # для соед с БД на локальном ком
     return conn
 
 '''
-
 
 def connect_db():  # для деплоя на heroku
     """Функция для установления соединения с базой данных PostgreSQL."""
@@ -42,7 +41,6 @@ def connect_db():  # для деплоя на heroku
     )
     conn.cursor_factory = DictCursor  # Сохраняем использование DictCursor
     return conn
-'''
 
 def create_db():
     """Вспомогательная функция для создания таблиц БД (без запуска вебсервера)"""
@@ -367,7 +365,7 @@ def delete_entry_employees(entry_id):
     return redirect(url_for('showEmployees'))
 
 
-# Маршрут для страницы редактирования записи в "Сотрудники"
+# Маршрут для страницы редактирования записи записи в "Сотрудники"
 @app.route('/edit_entry_employees/<int:entry_id>', methods=['GET'])
 def edit_entry_employees(entry_id):
     entry_data = dbase.get_entry_employees(entry_id)
@@ -375,7 +373,7 @@ def edit_entry_employees(entry_id):
     return render_template('edit_entry_employees.html', title="Редактировать", entry_data=entry_data)
 
 
-# Маршрут для сохранения изменений в "Сотрудники"
+# Маршрут для сохранения изменений  в "Сотрудники"
 @app.route('/save_entry_employees/<int:entry_id>', methods=['POST'])
 def save_entry_employees(entry_id):
     name = request.form['name']
@@ -398,5 +396,5 @@ def close_db(error):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=False)  # для отладки debug=True
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
